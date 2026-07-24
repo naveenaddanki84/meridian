@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* canvas + ink */
+  --color-paper: #f7f6f3;
+  --color-card: #ffffff;
+  --color-ink: #1c2321;
+  --color-ink-soft: #56605b;
+  --color-ink-faint: #8a948e;
+  --color-line: #e5e3db;
+  --color-line-strong: #cfccc2;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* brand — ledger green */
+  --color-spruce: #245044;
+  --color-spruce-deep: #17362d;
+  --color-spruce-soft: #e9efeb;
+  --color-spruce-wash: #f1f4f0;
+
+  /* functional affordance colors (these ARE the interaction language) */
+  --color-ai: #5b5bd6;
+  --color-ai-soft: #eeeefb;
+  --color-ai-line: #c9c9f2;
+  --color-verified: #2e7d4f;
+  --color-verified-soft: #e6f2ea;
+  --color-attention: #b45309;
+  --color-attention-soft: #fdf1e3;
+  --color-danger: #b3261e;
+  --color-danger-soft: #f9e8e6;
+  --color-locked: #6e7674;
+  --color-locked-soft: #eeeeea;
+
+  /* type */
+  --font-sans: var(--font-public-sans), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --shadow-lift: 0 1px 2px rgb(28 35 33 / 0.05), 0 4px 16px rgb(28 35 33 / 0.06);
+  --shadow-pop: 0 2px 6px rgb(28 35 33 / 0.08), 0 12px 32px rgb(28 35 33 / 0.14);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f6f3;
+  color: #1c2321;
+  font-family: var(--font-public-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* figures always tabular */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: #d7e3dc;
+}
+
+:focus-visible {
+  outline: 2px solid #245044;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* receipt edge — dashed tear line for provenance cards */
+.receipt-edge {
+  position: relative;
+}
+.receipt-edge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  border-top: 2px dashed #cfccc2;
+}
+
+/* the trace thread draws itself */
+@keyframes trace-dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.trace-path {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: trace-dash 0.45s ease-out forwards;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.25s ease-out both;
 }

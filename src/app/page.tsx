@@ -24,9 +24,11 @@ const PERSONA_BLURB: Record<string, string> = {
   priya:
     "First tax season with the firm. Sees a calm home, plain-English status, and exactly what to do next.",
   marcus:
-    "Owns 11 returns in the middle of the season. Sees a prioritized queue and the deep review workspace.",
+    "Owns dozens of returns mid-season. Sees a prioritized queue and the deep review workspace.",
   dana: "Second set of eyes. Same product, review-first lens.",
-  ruth: "Watches deadlines and workload across the firm.",
+  ruth: "Watches deadlines and workload across the whole firm.",
+  ben: "Business owner. Same client experience, different return.",
+  kim: "Seasonal staff. Sees only the returns assigned to her.",
 };
 
 /**

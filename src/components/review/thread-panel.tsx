@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Globe, Lock, Send, X } from "lucide-react";
 import { personaById } from "@/data/people";
+import { daysSince } from "@/lib/format";
 import type { Thread, ThreadAnchor } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,30 @@ export function ThreadPanel({
   const [draft, setDraft] = useState("");
   const [newBody, setNewBody] = useState("");
   const [newVisibility, setNewVisibility] = useState<Thread["visibility"]>("client");
+
+  // Outstanding-request tracking (Challenge 02): group by whose move it
+  // is, so open asks never blur into a generic inbox.
+  const groups = [
+    {
+      label: `Waiting on ${clientFirstName}`,
+      items: threads.filter((t) => t.status !== "resolved" && t.nextActionOwner === "client"),
+    },
+    {
+      label: "Firm's move",
+      items: threads.filter((t) => t.status !== "resolved" && t.nextActionOwner !== "client"),
+    },
+    {
+      label: "Resolved",
+      items: threads.filter((t) => t.status === "resolved"),
+    },
+  ].filter((g) => g.items.length > 0);
+
+  const askedAgo = (thread: Thread): string => {
+    const last = thread.messages[thread.messages.length - 1];
+    if (!last) return "";
+    const days = daysSince(last.sentAt);
+    return days === 0 ? "today" : `${days}d ago`;
+  };
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -151,7 +176,13 @@ export function ThreadPanel({
           </div>
         )}
 
-        {threads.map((thread) => {
+        {groups.map((group) => (
+          <div key={group.label}>
+            <p className="mb-1.5 mt-1 px-0.5 text-[11px] font-bold uppercase tracking-wide text-ink-faint">
+              {group.label} · {group.items.length}
+            </p>
+            <div className="space-y-2.5">
+        {group.items.map((thread) => {
           const expanded = expandedId === thread.id;
           return (
             <div
@@ -174,6 +205,9 @@ export function ThreadPanel({
                 </div>
                 <span className="text-[13px] font-semibold leading-snug text-ink">
                   {thread.subject}
+                </span>
+                <span className="text-[11px] text-ink-faint">
+                  last message {askedAgo(thread)}
                 </span>
               </button>
 
@@ -235,6 +269,9 @@ export function ThreadPanel({
             </div>
           );
         })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

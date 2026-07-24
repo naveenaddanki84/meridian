@@ -10,6 +10,7 @@ import {
   Sunrise,
 } from "lucide-react";
 import { useRole } from "@/lib/role";
+import { useClientProgress } from "@/lib/client-progress";
 import type { RoleId } from "@/data/types";
 
 interface NavItem {
@@ -28,7 +29,7 @@ const NAV_BY_ROLE: Record<RoleId, readonly NavItem[]> = {
   client: [
     { label: "Home", href: "/client", icon: House },
     { label: "Your documents", href: "/client/documents", icon: FileText },
-    { label: "Questions for you", href: "/client/questions", icon: MessageCircleQuestion, badge: 2 },
+    { label: "Questions for you", href: "/client/questions", icon: MessageCircleQuestion },
   ],
   preparer: [
     { label: "Today", href: "/staff", icon: Sunrise },
@@ -55,11 +56,20 @@ function isActive(pathname: string, href: string): boolean {
 export function NavItems({ orientation }: { orientation: "vertical" | "horizontal" }) {
   const pathname = usePathname();
   const { persona } = useRole();
+  const progress = useClientProgress();
   // The shell wins over the badge: a staff member wearing their client hat
   // inside /client sees client navigation — firm tools stay hidden there.
-  const items = pathname.startsWith("/client")
-    ? NAV_BY_ROLE.client
-    : NAV_BY_ROLE[persona.role];
+  const inClientShell = pathname.startsWith("/client");
+  const baseItems = inClientShell ? NAV_BY_ROLE.client : NAV_BY_ROLE[persona.role];
+
+  // The badge is live: answering or uploading clears it (Challenge 03).
+  const openQuestions =
+    persona.id === "priya"
+      ? (progress.questionAnswered ? 0 : 1) + (progress.k1Uploaded ? 0 : 1)
+      : 0;
+  const items = baseItems.map((item) =>
+    item.href === "/client/questions" ? { ...item, badge: openQuestions } : item,
+  );
 
   return (
     <nav

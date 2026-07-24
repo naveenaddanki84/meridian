@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Send } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
+import { readProgress, updateProgress, useClientProgress } from "@/lib/client-progress";
 import { HERO_RETURN_ID } from "@/data/hero";
 import { personaById } from "@/data/people";
 import type { Thread } from "@/data/types";
@@ -22,7 +23,8 @@ import { EmptyState } from "@/components/ui/empty-state";
  */
 export default function ClientQuestions() {
   const { persona } = useRole();
-  const isPriya = persona.role === "client";
+  const isPriya = persona.id === "priya";
+  const progress = useClientProgress();
   const { data: apiThreads, loading } = useQuery(
     () => api.getThreads(HERO_RETURN_ID, "client"),
     [],
@@ -31,6 +33,15 @@ export default function ClientQuestions() {
   const [answered, setAnswered] = useState<Readonly<Record<string, string>>>({});
   const [draft, setDraft] = useState("");
   const [draftThreadId, setDraftThreadId] = useState<string | null>(null);
+
+  // An answer given on a previous visit stays answered.
+  useEffect(() => {
+    if (readProgress().questionAnswered) {
+      setAnswered((prev) =>
+        prev["t-receipt"] ? prev : { ...prev, "t-receipt": "It was $300 — sorry about my handwriting!" },
+      );
+    }
+  }, []);
 
   if (!isPriya) {
     return (
@@ -44,12 +55,15 @@ export default function ClientQuestions() {
   }
 
   const threads = apiThreads ?? [];
-  const openCount = threads.filter((t) => !answered[t.id] && t.status !== "resolved").length;
+  const isDone = (threadId: string) =>
+    Boolean(answered[threadId]) || (threadId === "t-k1" && progress.k1Uploaded);
+  const openCount = threads.filter((t) => !isDone(t.id) && t.status !== "resolved").length;
 
   const answer = (thread: Thread, text: string) => {
     setAnswered((prev) => ({ ...prev, [thread.id]: text }));
     setDraft("");
     setDraftThreadId(null);
+    if (thread.id === "t-receipt") updateProgress({ questionAnswered: true });
   };
 
   return (
@@ -70,15 +84,16 @@ export default function ClientQuestions() {
           const reply = answered[thread.id];
           const isReceiptQuestion = thread.id === "t-receipt";
           const isDocRequest = thread.anchor.type === "document";
+          const docUploaded = isDocRequest && progress.k1Uploaded;
 
           return (
             <li key={thread.id} className="rounded-2xl border border-line bg-card p-4 shadow-lift">
               <div className="flex items-center gap-2">
                 <Badge tone="brand">About: {thread.anchor.label}</Badge>
-                {reply ? (
+                {reply || docUploaded ? (
                   <Badge tone="verified">
                     <Check className="h-3 w-3" />
-                    Answered
+                    {docUploaded && !reply ? "Done" : "Answered"}
                   </Badge>
                 ) : (
                   <Badge tone="attention">Your turn</Badge>
@@ -157,12 +172,19 @@ export default function ClientQuestions() {
                 </div>
               )}
 
-              {!reply && isDocRequest && (
+              {!reply && isDocRequest && !docUploaded && (
                 <div className="mt-3">
                   <Link href="/client/documents">
                     <Button size="sm" variant="primary">Upload it now</Button>
                   </Link>
                 </div>
+              )}
+
+              {docUploaded && !reply && (
+                <p className="mt-3 flex items-center gap-1.5 text-[12px] font-semibold text-verified">
+                  <Check className="h-3.5 w-3.5" />
+                  You uploaded it — we&apos;ve read it already. Nothing else needed.
+                </p>
               )}
             </li>
           );

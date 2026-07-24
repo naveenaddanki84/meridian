@@ -37,7 +37,7 @@ const STAGE_POOL: readonly StageId[] = [
   "filed",
 ];
 
-const PREPARERS = ["marcus", "marcus", "marcus", "sofia", "james"] as const;
+const PREPARERS = ["marcus", "marcus", "marcus", "sofia", "sofia", "james", "kim"] as const;
 
 function isoDay(monthIndex: number, day: number, year = 2026): string {
   const mm = String(monthIndex).padStart(2, "0");
@@ -45,15 +45,28 @@ function isoDay(monthIndex: number, day: number, year = 2026): string {
   return `${year}-${mm}-${dd}`;
 }
 
+/**
+ * Volume matters (Ch 07/09): enough returns that a preparer's queue and
+ * the documents list get tested at realistic scale, not demo scale.
+ */
+const RETURN_COUNT = 120;
+
 function buildReturns(): readonly TaxReturn[] {
-  const generated = Array.from({ length: 24 }, (_, i): TaxReturn => {
+  const generated = Array.from({ length: RETURN_COUNT }, (_, i): TaxReturn => {
     const first = FIRST[i % FIRST.length];
-    const last = LAST[i % LAST.length];
+    // Decorrelate so name pairs don't repeat in lockstep.
+    const last = LAST[(i * 7 + Math.floor(i / FIRST.length)) % LAST.length];
     const stage = STAGE_POOL[i % STAGE_POOL.length];
     const blockedOnClient = stage === "docs_needed" || (stage === "client_approval" && rand() > 0.4);
     const docsExpected = randInt(4, 12);
     const docsReceived = stage === "getting_started" ? 0 : blockedOnClient ? randInt(1, docsExpected - 1) : docsExpected;
-    const deadline = i % 7 === 3 ? isoDay(3, randInt(3, 14)) : isoDay(4, randInt(1, 15));
+    // A few returns are genuinely overdue — the edge case must exist.
+    const deadline =
+      i % 23 === 5
+        ? isoDay(2, randInt(20, 27))
+        : i % 7 === 3
+          ? isoDay(3, randInt(3, 14))
+          : isoDay(4, randInt(1, 15));
     return {
       id: `ret-${i + 1}`,
       clientName: `${first} ${last}`,

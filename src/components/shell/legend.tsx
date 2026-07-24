@@ -41,6 +41,10 @@ export function LegendButton() {
             <span className="text-right">The AI isn&apos;t sure — look before trusting</span>
           </li>
           <li className="flex items-center justify-between gap-3">
+            <StateBadge state="needs_approval" />
+            <span className="text-right">Client-reported — doesn&apos;t count until the firm approves it</span>
+          </li>
+          <li className="flex items-center justify-between gap-3">
             <StateBadge state="verified" />
             <span className="text-right">A person confirmed it against the source</span>
           </li>

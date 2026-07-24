@@ -89,6 +89,7 @@ export interface TaxDocument {
 export type FieldState =
   | "ai_generated"
   | "needs_review"
+  | "needs_approval"
   | "verified"
   | "edited"
   | "locked";
@@ -154,6 +155,27 @@ export interface Thread {
   nextActionOwner: "client" | "staff" | "done";
   status: ThreadStatus;
   messages: readonly Message[];
+}
+
+export type InsightKind = "recommendation" | "warning";
+
+/**
+ * A simulated AI recommendation or warning (Challenge 10): what the AI
+ * noticed, why, the evidence, and what to do about it.
+ */
+export interface Insight {
+  id: string;
+  returnId: string;
+  kind: InsightKind;
+  title: string;
+  /** The reasoning, in plain words. */
+  why: string;
+  /** Evidence chips — each can focus a document box. */
+  evidence: readonly { label: string; documentId?: string; boxId?: string }[];
+  /** The action the AI suggests. */
+  suggestedAction: string;
+  /** Uncertainty in words, not a raw score. */
+  caveat?: string;
 }
 
 export interface ChecklistItem {

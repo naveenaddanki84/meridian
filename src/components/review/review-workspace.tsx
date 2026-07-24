@@ -17,12 +17,14 @@ import { CardSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DocViewer } from "./doc-viewer";
 import { FieldList } from "./field-list";
+import { InsightCards } from "./insight-cards";
 import { ThreadPanel } from "./thread-panel";
 import { TraceThread } from "./trace-thread";
 
 const TRACE_COLOR: Record<string, string> = {
   ai_generated: "#5b5bd6",
   needs_review: "#b45309",
+  needs_approval: "#245044",
   verified: "#2e7d4f",
   edited: "#56605b",
   locked: "#6e7674",
@@ -41,6 +43,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   const { data: apiFields } = useQuery(() => api.getFields(returnId), [returnId]);
   const { data: documents } = useQuery(() => api.getDocumentsForReturn(returnId), [returnId]);
   const { data: apiThreads } = useQuery(() => api.getThreads(returnId, "staff"), [returnId]);
+  const { data: insights } = useQuery(() => api.getInsights(returnId), [returnId]);
 
   // Local, immutable overrides on top of the (read-only) mock API data.
   const [fieldOverrides, setFieldOverrides] = useState<Readonly<Record<string, ReturnField>>>({});
@@ -65,6 +68,8 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   );
   const [panelOpen, setPanelOpen] = useState(() => searchParams.get("thread") !== null);
   const [newAnchor, setNewAnchor] = useState<ThreadAnchor | null>(null);
+  /** Evidence focus from an AI insight — highlights a box with no field selected. */
+  const [focusBoxId, setFocusBoxId] = useState<string | null>(null);
   const initialThreadId = useRef(searchParams.get("thread")).current;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -94,6 +99,11 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     if (field?.source.kind === "document" && field.source.documentId) {
       setActiveDocId(field.source.documentId);
     }
+    if (field) {
+      window.setTimeout(() => {
+        rowEls.current.get(field.id)?.scrollIntoView({ block: "center" });
+      }, 80);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiFields]);
 
@@ -115,9 +125,19 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     [ret],
   );
 
+  const showEvidence = useCallback((documentId: string, boxId: string) => {
+    setSelectedFieldId(null);
+    setActiveDocId(documentId);
+    setFocusBoxId(boxId);
+    window.setTimeout(() => {
+      boxEls.current.get(boxId)?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 60);
+  }, []);
+
   const selectField = useCallback(
     (id: string | null) => {
       setSelectedFieldId(id);
+      setFocusBoxId(null);
       const field = fields.find((f) => f.id === id);
       let docId = activeDocId;
       if (field?.source.kind === "document" && field.source.documentId) {
@@ -196,9 +216,12 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     setNewAnchor(null);
   };
 
-  // The verification workflow (Ch 10): unchecked AI values form a queue.
+  // The verification workflow (Ch 10): everything awaiting a human forms a queue.
   const uncheckedFields = fields.filter(
-    (f) => f.state === "ai_generated" || f.state === "needs_review",
+    (f) =>
+      f.state === "ai_generated" ||
+      f.state === "needs_review" ||
+      f.state === "needs_approval",
   );
   const stepToNextUnchecked = () => {
     if (uncheckedFields.length === 0) return;
@@ -277,7 +300,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
           {uncheckedFields.length > 0 ? (
             <Button size="sm" onClick={stepToNextUnchecked}>
               <ScanSearch className="h-3.5 w-3.5 text-ai" />
-              Check next AI value
+              Review next flagged value
               <span className="rounded-full bg-ai-soft px-1.5 text-[11px] font-bold text-ai">
                 {uncheckedFields.length}
               </span>
@@ -294,6 +317,8 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
           </Button>
         </div>
       </div>
+
+      <InsightCards insights={insights ?? []} onShowEvidence={showEvidence} />
 
       {/* Workspace body */}
       <div ref={containerRef} className="relative flex min-h-0 flex-1 gap-6">
@@ -318,7 +343,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
             activeBoxId={
               selectedField?.source.kind === "document"
                 ? selectedField.source.boxId ?? null
-                : null
+                : focusBoxId
             }
             highlightColor={TRACE_COLOR[selectedField?.state ?? "ai_generated"]}
             onSelectDoc={(id) => {

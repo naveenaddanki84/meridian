@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, FileUp, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
+import { readProgress, updateProgress } from "@/lib/client-progress";
 import { relativeLabel } from "@/lib/format";
 import { HERO_RETURN_ID } from "@/data/hero";
 import type { TaxDocument } from "@/data/types";
@@ -37,13 +38,18 @@ function clientStatus(doc: TaxDocument): { label: string; tone: "verified" | "ne
 
 export default function ClientDocuments() {
   const { persona } = useRole();
-  const isPriya = persona.role === "client";
+  const isPriya = persona.id === "priya";
   const { data: documents, loading } = useQuery(
     () => api.getDocumentsForReturn(HERO_RETURN_ID),
     [],
   );
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("idle");
+
+  // If the K-1 was uploaded on a previous visit, keep it uploaded.
+  useEffect(() => {
+    if (readProgress().k1Uploaded) setUploadPhase("done");
+  }, []);
 
   if (!isPriya) {
     return (
@@ -59,7 +65,10 @@ export default function ClientDocuments() {
   const simulateUpload = () => {
     setUploadPhase("uploading");
     setTimeout(() => setUploadPhase("reading"), 900);
-    setTimeout(() => setUploadPhase("done"), 2400);
+    setTimeout(() => {
+      setUploadPhase("done");
+      updateProgress({ k1Uploaded: true });
+    }, 2400);
   };
 
   const docs = documents ?? [];

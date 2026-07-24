@@ -29,15 +29,15 @@ Loom/recording link here_
 | # | Challenge | Where it lives | The one-line decision |
 |---|-----------|----------------|----------------------|
 | 01 | Source traceability | Review workspace | Click any value → a drawn thread + highlighted box on the source document; calculations chain (click an input to keep tracing) |
-| 02 | Client & CPA collaboration | Conversations panel · client "Questions for you" | Threads pin to fields/documents, are marked *Firm only* vs *Client can see*, and always name whose move it is |
-| 03 | Where to start | Client home | One card: what needs you, how long it takes, in minutes — everything else waits |
+| 02 | Client & CPA collaboration | Conversations panel · client "Questions for you" | Threads pin to fields/documents, are marked *Firm only* vs *Client can see*, and outstanding requests are tracked — grouped by whose move it is, with age |
+| 03 | Where to start | Client home | One card: what needs you, how long it takes, in minutes — and the interface visibly changes as onboarding completes (finish both tasks and the checklist gives way to status) |
 | 04 | Getting lost | Everywhere | URL-deep-linkable state, breadcrumbs, thread→field jumps, and a "Back to Priya's return" chip that survives any detour |
-| 05 | Role-aware experiences | Role picker · persona menu · staff gate | One shell that adapts; a client hitting a firm URL gets a plain explanation, not a 404; Marcus can wear his client hat for his own return |
+| 05 | Role-aware experiences | Role picker · persona menu · staff gate | Six personas, one shell: client, business owner, preparer, reviewer, firm admin, seasonal staff. Each lands on its own default (reviewer → review queue, admin → whole firm, seasonal → own returns only, with the limitation stated); a client hitting a firm URL gets a plain explanation, not a 404; Marcus wears his client hat for his own return |
 | 06 | Status & progress | Client journey card · staff stage badges | One state machine, two renderings: five plain-English steps for clients, substages for staff |
-| 07 | Actionable dashboard | Staff *Today* | Real ranking logic (deadlines, unread replies, AI flags, blocked days) — every card shows its reasons and one next action |
-| 08 | Clickable vs. editable | The affordance system (Legend, top right) | Five states — AI·unverified / Check this / Verified / Edited / Locked — same marks on every screen; pencils appear only where editing is allowed; locks explain themselves |
-| 09 | Complexity made navigable | Documents (184 seeded) · ⌘K search | Fold by client, cut with filters, narrow by typing; summary lists one click above full detail |
-| 10 | Trustworthy AI | Provenance cards · client copy | Evidence → confidence in words → action; corrections keep the AI's original on record; clients get plain words, never percentages |
+| 07 | Actionable dashboard | Staff *Today* | Real ranking logic (deadlines, unread replies, AI flags, blocked days) over ~120 returns — every card shows its reasons and one next action, and firm scope adds a workload-by-preparer strip for managers |
+| 08 | Clickable vs. editable | The affordance system (Legend, top right) | Six states — AI·unverified / Check this / Needs approval / Verified / Edited / Locked — same marks on every screen; pencils appear only where editing is allowed; locks explain themselves |
+| 09 | Complexity made navigable | Documents (~950 seeded) · ⌘K search | Fold by client, cap what renders, cut with filters, narrow by typing; summary lists one click above full detail |
+| 10 | Trustworthy AI | AI review notes · provenance cards · client copy | Recommendations and warnings with the why, evidence chips that highlight the exact box, and uncertainty in words; corrections keep the AI's original on record; clients get plain words, never percentages |
 
 ## What's real vs. simulated
 
@@ -45,10 +45,13 @@ Loom/recording link here_
 - Every interaction above: tracing, correction/verify flows, threads and
   visibility rules, prioritization scoring, search, filters, deep links, role
   switching, the upload state machine
-- The dataset: ~25 returns and ~184 documents generated deterministically
+- The dataset: ~120 returns and ~950 documents generated deterministically
   (seeded PRNG) so edge cases are guaranteed present — a 62%-confidence
-  extraction, a locked filed return, returns blocked on clients for days,
-  overdue deadlines, empty states
+  extraction, a client-reported value awaiting approval, a locked filed
+  return, returns blocked on clients for days, overdue deadlines, empty
+  states
+- Onboarding progress is shared across pages: uploading the K-1 or answering
+  the question updates the home checklist, the nav badge, and "what's next"
 - A typed mock-API layer (`src/lib/api.ts`) with simulated latency — screens
   show real loading and error states
 

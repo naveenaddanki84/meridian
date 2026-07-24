@@ -1,4 +1,4 @@
-import { Check, Lock, PencilLine, Sparkles, TriangleAlert } from "lucide-react";
+import { Check, Lock, PencilLine, Sparkles, Stamp, TriangleAlert } from "lucide-react";
 import type { FieldState } from "@/data/types";
 
 export type Tone = "ai" | "verified" | "attention" | "danger" | "locked" | "neutral" | "brand";
@@ -44,6 +44,7 @@ interface StateStyle {
 export const FIELD_STATE_STYLE: Record<FieldState, StateStyle> = {
   ai_generated: { tone: "ai", label: "AI · unverified", icon: Sparkles },
   needs_review: { tone: "attention", label: "Check this", icon: TriangleAlert },
+  needs_approval: { tone: "brand", label: "Needs approval", icon: Stamp },
   verified: { tone: "verified", label: "Verified", icon: Check },
   edited: { tone: "neutral", label: "Edited", icon: PencilLine },
   locked: { tone: "locked", label: "Locked", icon: Lock },

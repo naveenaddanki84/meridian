@@ -41,7 +41,9 @@ export function ProvenanceCard({
 
   const { source, ai } = field;
   const box = sourceDoc?.boxes.find((b) => b.id === source.boxId) ?? null;
-  const canAct = field.state === "ai_generated" || field.state === "needs_review";
+  const needsApproval = field.state === "needs_approval";
+  const canAct =
+    field.state === "ai_generated" || field.state === "needs_review" || needsApproval;
   const wasCorrected =
     field.state === "edited" && ai && ai.extractedValue !== field.value;
 
@@ -183,7 +185,7 @@ export function ProvenanceCard({
             <>
               <Button size="sm" variant="primary" onClick={onVerify}>
                 <Check className="h-3.5 w-3.5" />
-                Looks right
+                {needsApproval ? "Approve" : "Looks right"}
               </Button>
               <Button
                 size="sm"

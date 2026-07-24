@@ -53,6 +53,11 @@ export default function StaffDocuments() {
   const missingCount = filtered.filter((d) => d.status === "needed").length;
   const searching = query.trim() !== "" || kind !== null || status !== null;
 
+  // Progressive disclosure at scale: never render hundreds of groups at
+  // once — search and filters are the way in (Challenge 09).
+  const GROUP_CAP = 40;
+  const visibleGroups = groups.slice(0, GROUP_CAP);
+
   const toggleClient = (name: string) => {
     setOpenClients((prev) => {
       const next = new Set(prev);
@@ -134,7 +139,7 @@ export default function StaffDocuments() {
 
       {/* Grouped by client; folded until relevant */}
       <ul className="space-y-1.5">
-        {groups.map(([clientName, docs]) => {
+        {visibleGroups.map(([clientName, docs]) => {
           const open = searching || openClients.has(clientName);
           const missing = docs.filter((d) => d.status === "needed").length;
           return (
@@ -195,6 +200,13 @@ export default function StaffDocuments() {
           );
         })}
       </ul>
+
+      {groups.length > GROUP_CAP && (
+        <p className="mt-3 rounded-xl border border-dashed border-line-strong bg-card/60 px-4 py-3 text-center text-[12px] text-ink-soft">
+          Showing {GROUP_CAP} of {groups.length} clients — search or filter to
+          narrow the rest.
+        </p>
+      )}
 
       {!loading && filtered.length === 0 && (
         <p className="rounded-xl border border-dashed border-line-strong bg-card/60 px-4 py-8 text-center text-[13px] text-ink-soft">

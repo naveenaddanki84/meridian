@@ -5,6 +5,7 @@ import { Check, ChevronRight, Clock3 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
+import { useClientProgress } from "@/lib/client-progress";
 import { HERO_RETURN_ID } from "@/data/hero";
 import type { ChecklistItem } from "@/data/types";
 import { JourneyCard } from "@/components/client/journey-card";
@@ -46,7 +47,8 @@ const MARCUS_ITEMS: readonly ChecklistItem[] = [
 
 export default function ClientHome() {
   const { persona } = useRole();
-  const isPriya = persona.role === "client";
+  const progress = useClientProgress();
+  const isPriya = persona.id === "priya";
   const returnId = isPriya ? HERO_RETURN_ID : (persona.alsoClientOfReturnId ?? HERO_RETURN_ID);
 
   const { data: ret, loading } = useQuery(() => api.getReturn(returnId), [returnId]);
@@ -55,11 +57,40 @@ export default function ClientHome() {
     [isPriya],
   );
 
-  const checklist = apiChecklist ?? [];
+  // Live progress: finishing a task anywhere updates the home checklist.
+  const checklist = (apiChecklist ?? []).map((item) => {
+    if (!isPriya) return item;
+    if (item.id === "chk-docs" && progress.k1Uploaded)
+      return { ...item, done: true, detail: "All 5 in — thank you!" };
+    if (item.id === "chk-question" && progress.questionAnswered)
+      return { ...item, done: true, detail: "Answered — Marcus is on it" };
+    return item;
+  });
   const openItems = checklist.filter((item) => !item.done);
   const totalMinutes = openItems.reduce((sum, item) => sum + item.minutes, 0);
   const firstName = persona.name.split(" ")[0];
   const preparerName = isPriya ? "Marcus Bell, your preparer" : "Sofia Reyes, your preparer";
+
+  // Only Priya (and Marcus's personal return) are wired end-to-end.
+  if (!isPriya && !persona.alsoClientOfReturnId) {
+    return (
+      <div className="mx-auto max-w-xl">
+        <header className="mb-6">
+          <h1 className="font-display text-3xl tracking-tight text-ink">
+            Good morning, {firstName}
+          </h1>
+        </header>
+        <div className="rounded-2xl border border-dashed border-line-strong bg-card/60 px-6 py-10 text-center">
+          <p className="font-semibold text-ink">This account isn&apos;t wired in the prototype</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-ink-soft">
+            {firstName}&apos;s home would work exactly like Priya&apos;s — switch
+            to Priya Sharma from the top-right menu to see the full client
+            experience.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-xl">
@@ -146,9 +177,11 @@ export default function ClientHome() {
           ret={ret}
           preparerName={preparerName}
           nextUp={
-            isPriya
-              ? "Once your K-1 arrives and you confirm one donation amount, Marcus finishes preparing and a reviewer double-checks everything."
-              : "Upload the rest of your documents so Sofia can start preparing."
+            !isPriya
+              ? "Upload the rest of your documents so Sofia can start preparing."
+              : openItems.length === 0
+                ? "Marcus double-checks your numbers, then a reviewer signs off. We'll email you when it's your turn to approve."
+                : "Once your K-1 arrives and you confirm one donation amount, Marcus finishes preparing and a reviewer double-checks everything."
           }
         />
       )}

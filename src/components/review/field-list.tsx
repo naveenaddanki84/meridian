@@ -46,7 +46,9 @@ export function FieldList({
               .map((field) => {
                 const selected = field.id === selectedFieldId;
                 const editable =
-                  field.state === "ai_generated" || field.state === "needs_review";
+                  field.state === "ai_generated" ||
+                  field.state === "needs_review" ||
+                  field.state === "needs_approval";
                 const threadCount = threads.filter(
                   (t) => t.anchor.type === "field" && t.anchor.id === field.id,
                 ).length;

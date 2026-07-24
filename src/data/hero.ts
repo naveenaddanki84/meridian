@@ -1,4 +1,4 @@
-import type { ReturnField, TaxDocument, TaxReturn, Thread } from "./types";
+import type { Insight, ReturnField, TaxDocument, TaxReturn, Thread } from "./types";
 
 /**
  * The "hero" return: Priya Sharma's 2025 Form 1040, fully wired for the
@@ -240,6 +240,20 @@ export const heroFields: readonly ReturnField[] = [
     source: { kind: "document", documentId: "doc-receipt", boxId: "rc-amount", page: 1 },
   },
   {
+    id: "f-ira",
+    returnId: HERO_RETURN_ID,
+    section: "Deductions",
+    label: "IRA contribution",
+    formRef: "Sch 1 · Line 20",
+    value: "$2,400.00",
+    state: "needs_approval",
+    source: {
+      kind: "client_answer",
+      clientNote:
+        "Priya reported this in her getting-started questions (Feb 12). No Form 5498 is on file yet — client-reported deductions need preparer approval before they count.",
+    },
+  },
+  {
     id: "f-std-deduction",
     returnId: HERO_RETURN_ID,
     section: "Deductions",
@@ -324,6 +338,34 @@ export const heroFields: readonly ReturnField[] = [
         { label: "Federal tax (Line 16)", value: "$10,922.00", fieldId: "f-tax" },
       ],
     },
+  },
+] as const;
+
+export const heroInsights: readonly Insight[] = [
+  {
+    id: "ins-itemize",
+    returnId: HERO_RETURN_ID,
+    kind: "recommendation",
+    title: "Keep the standard deduction",
+    why: "Priya's itemizable expenses — the donation plus state income tax — add up to roughly $5,280, far below the $15,000 standard deduction. Itemizing would cost her money.",
+    evidence: [
+      { label: "Donation · $300", documentId: "doc-receipt", boxId: "rc-amount" },
+      { label: "State tax · $4,980", documentId: "doc-w2", boxId: "w2-box17" },
+    ],
+    suggestedAction: "Keep standard",
+    caveat: "Worth revisiting if the K-1 brings deductible expenses.",
+  },
+  {
+    id: "ins-sswage",
+    returnId: HERO_RETURN_ID,
+    kind: "warning",
+    title: "W-2 boxes don't match — and that's expected",
+    why: "Social Security wages ($92,100) are higher than Box 1 wages ($85,200). The gap is exactly the $6,900 401(k) deferral in Box 12a, so nothing looks wrong.",
+    evidence: [
+      { label: "Box 3 · 92,100", documentId: "doc-w2", boxId: "w2-box3" },
+      { label: "Box 12a · 6,900", documentId: "doc-w2", boxId: "w2-box12a" },
+    ],
+    suggestedAction: "No action needed",
   },
 ] as const;
 

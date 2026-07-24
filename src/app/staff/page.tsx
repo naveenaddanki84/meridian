@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, ChevronRight, Sprout } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
@@ -26,6 +26,13 @@ const REASON_TONE: Record<PriorityReason["tone"], Tone> = {
  * (Challenge 07). Ranked by real logic — every card says why it's there
  * and what to do about it.
  */
+const PREPARER_NAME: Record<string, string> = {
+  marcus: "Marcus",
+  sofia: "Sofia",
+  james: "James",
+  kim: "Kim (seasonal)",
+};
+
 export default function StaffDashboard() {
   const { persona } = useRole();
   const { data: returns, loading } = useQuery(() => api.getReturns(), []);
@@ -33,6 +40,24 @@ export default function StaffDashboard() {
     persona.role === "preparer" ? "mine" : "firm",
   );
   const [filter, setFilter] = useState<QueueFilter>("action");
+
+  const isSeasonal = persona.id === "kim";
+
+  // Each role lands on its own sensible default (Challenge 05):
+  // reviewers on the review queue, admins on the whole firm, seasonal
+  // staff locked to their own returns.
+  useEffect(() => {
+    if (persona.role === "reviewer") {
+      setScope("firm");
+      setFilter("review");
+    } else if (persona.role === "admin") {
+      setScope("firm");
+      setFilter("action");
+    } else {
+      setScope("mine");
+      setFilter("action");
+    }
+  }, [persona.id, persona.role]);
 
   const ranked = useMemo(() => {
     if (!returns) return [];
@@ -46,13 +71,29 @@ export default function StaffDashboard() {
   const needsAction = ranked.filter((r) => r.score >= 20);
 
   const visible =
-    filter === "waiting" ? waiting
-    : filter === "review" ? inReview
+    filter === "waiting" ? waiting.slice(0, 25)
+    : filter === "review" ? inReview.slice(0, 25)
     : filter === "action" ? needsAction.slice(0, 8)
-    : ranked;
+    : ranked.slice(0, 25);
 
   const filedCount = (returns ?? []).filter((r) => r.stage === "filed").length;
   const daysToApril = daysUntil("2026-04-15");
+
+  // Manager lens (Challenge 07): workload and trouble spots by preparer.
+  const workload = useMemo(() => {
+    if (!returns || scope !== "firm") return [];
+    const byPreparer = new Map<string, { open: number; overdue: number; blocked: number }>();
+    for (const r of returns) {
+      if (r.locked) continue;
+      const entry = byPreparer.get(r.assigneeId) ?? { open: 0, overdue: 0, blocked: 0 };
+      byPreparer.set(r.assigneeId, {
+        open: entry.open + 1,
+        overdue: entry.overdue + (daysUntil(r.deadline) < 0 ? 1 : 0),
+        blocked: entry.blocked + (r.blockedOn === "client" ? 1 : 0),
+      });
+    }
+    return [...byPreparer.entries()].sort((a, b) => b[1].open - a[1].open);
+  }, [returns, scope]);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -64,22 +105,56 @@ export default function StaffDashboard() {
           <h1 className="font-display text-3xl tracking-tight text-ink">
             {scope === "mine" ? `Your queue, ${persona.name.split(" ")[0]}` : "The whole firm"}
           </h1>
-          <div className="ml-auto flex rounded-lg border border-line bg-card p-0.5">
-            {(["mine", "firm"] as const).map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setScope(s)}
-                className={`rounded-md px-3 py-1 text-[12px] font-semibold transition-colors ${
-                  scope === s ? "bg-spruce text-white" : "text-ink-soft hover:text-ink"
-                }`}
-              >
-                {s === "mine" ? "My returns" : "Whole firm"}
-              </button>
-            ))}
-          </div>
+          {!isSeasonal && (
+            <div className="ml-auto flex rounded-lg border border-line bg-card p-0.5">
+              {(["mine", "firm"] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setScope(s)}
+                  className={`rounded-md px-3 py-1 text-[12px] font-semibold transition-colors ${
+                    scope === s ? "bg-spruce text-white" : "text-ink-soft hover:text-ink"
+                  }`}
+                >
+                  {s === "mine" ? "My returns" : "Whole firm"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+        {isSeasonal && (
+          <p className="mt-2 flex items-center gap-1.5 rounded-lg bg-locked-soft px-3 py-2 text-[12px] text-ink-soft">
+            <Sprout className="h-3.5 w-3.5 shrink-0 text-locked" />
+            Seasonal access — you see only the returns assigned to you. Firm-wide
+            views need a full staff account.
+          </p>
+        )}
       </header>
+
+      {/* Manager lens: how the season is spread across the team */}
+      {workload.length > 0 && (
+        <div className="mb-5 flex flex-wrap gap-2">
+          {workload.map(([assignee, stats]) => (
+            <div
+              key={assignee}
+              className="flex items-baseline gap-2 rounded-xl border border-line bg-card/70 px-3.5 py-2"
+            >
+              <span className="text-[13px] font-semibold text-ink">
+                {PREPARER_NAME[assignee] ?? assignee}
+              </span>
+              <span className="tnum font-mono text-[12px] text-ink-soft">{stats.open} open</span>
+              {stats.overdue > 0 && (
+                <Badge tone="danger">{stats.overdue} overdue</Badge>
+              )}
+              {stats.blocked > 0 && (
+                <span className="text-[11px] text-ink-faint">
+                  {stats.blocked} waiting on clients
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Actionable tiles — each one filters the queue below */}
       <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">

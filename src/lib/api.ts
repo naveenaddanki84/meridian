@@ -1,7 +1,8 @@
-import { heroFields, heroThreads, HERO_RETURN_ID } from "@/data/hero";
+import { heroFields, heroInsights, heroThreads, HERO_RETURN_ID } from "@/data/hero";
 import { ALL_DOCUMENTS, ALL_RETURNS } from "@/data/seed";
 import type {
   ChecklistItem,
+  Insight,
   ReturnField,
   TaxDocument,
   TaxReturn,
@@ -48,6 +49,11 @@ export const api = {
 
   getFields(returnId: string): Promise<readonly ReturnField[]> {
     return respond(returnId === HERO_RETURN_ID ? heroFields : []);
+  },
+
+  /** Simulated AI recommendations/warnings — a stub returning plausible JSON. */
+  getInsights(returnId: string): Promise<readonly Insight[]> {
+    return respond(heroInsights.filter((i) => i.returnId === returnId));
   },
 
   getDocuments(filters: DocumentFilters = {}): Promise<readonly TaxDocument[]> {

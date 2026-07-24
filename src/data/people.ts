@@ -17,7 +17,7 @@ export const PERSONAS: readonly Persona[] = [
     id: "marcus",
     name: "Marcus Bell",
     role: "preparer",
-    title: "Senior preparer · owns 11 returns",
+    title: "Senior preparer · deep in the season",
     initials: "MB",
     alsoClientOfReturnId: "ret-marcus",
   },
@@ -34,6 +34,20 @@ export const PERSONAS: readonly Persona[] = [
     role: "admin",
     title: "Firm admin · staffing and deadlines",
     initials: "RA",
+  },
+  {
+    id: "ben",
+    name: "Ben Carver",
+    role: "client",
+    title: "Business owner · 1120-S for Carver Coffee",
+    initials: "BC",
+  },
+  {
+    id: "kim",
+    name: "Kim Falk",
+    role: "preparer",
+    title: "Seasonal staff · only assigned returns",
+    initials: "KF",
   },
 ] as const;
 

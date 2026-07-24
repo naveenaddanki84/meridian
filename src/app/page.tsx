@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Check, RotateCcw } from "lucide-react";
 import { PERSONAS } from "@/data/people";
 import { rememberPersona } from "@/lib/role";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,21 @@ const PERSONA_BLURB: Record<string, string> = {
 export default function RolePicker() {
   const featured = PERSONAS.filter((p) => p.id === "priya" || p.id === "marcus");
   const others = PERSONAS.filter((p) => p.id !== "priya" && p.id !== "marcus");
+  const [resetDone, setResetDone] = useState(false);
+
+  // Put the demo back to the first morning: Priya's tasks reopen, personas
+  // and "back to" chips clear. Handy for walkthroughs and re-evaluation.
+  const resetDemo = () => {
+    try {
+      window.localStorage.removeItem("meridian.persona");
+      window.localStorage.removeItem("meridian.client-progress");
+      window.sessionStorage.removeItem("meridian.workspace-spot");
+      setResetDone(true);
+      window.setTimeout(() => setResetDone(false), 2000);
+    } catch {
+      // Storage unavailable — nothing to reset.
+    }
+  };
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-3xl flex-col px-6 py-10">
@@ -107,9 +123,28 @@ export default function RolePicker() {
         </div>
       </main>
 
-      <footer className="text-[11px] leading-relaxed text-ink-faint">
-        Built for the AI Engineer case study. Every name, number, and AI output
-        is fabricated; the interactions are real. No real tax advice lives here.
+      <footer className="flex flex-wrap items-center justify-between gap-3 text-[11px] leading-relaxed text-ink-faint">
+        <span className="max-w-md">
+          Built for the AI Engineer case study. Every name, number, and AI output
+          is fabricated; the interactions are real. No real tax advice lives here.
+        </span>
+        <button
+          type="button"
+          onClick={resetDemo}
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 py-1.5 font-semibold text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
+        >
+          {resetDone ? (
+            <>
+              <Check className="h-3.5 w-3.5 text-verified" />
+              Fresh start ready
+            </>
+          ) : (
+            <>
+              <RotateCcw className="h-3.5 w-3.5" />
+              Reset demo
+            </>
+          )}
+        </button>
       </footer>
     </div>
   );

@@ -52,6 +52,12 @@ Loom/recording link here_
   states
 - Onboarding progress is shared across pages: uploading the K-1 or answering
   the question updates the home checklist, the nav badge, and "what's next"
+- The message loop crosses roles: answer as Priya and her reply appears in
+  Marcus's conversation panel with ownership flipped to "Firm's move", and
+  his dashboard flags "Client replied — unread"; his replies reach her view
+  (localStorage stands in for the realtime backend)
+- The onboarding questionnaire is reviewable at /client/questionnaire — two
+  answers literally became return values with "from your answers" receipts
 - A typed mock-API layer (`src/lib/api.ts`) with simulated latency — screens
   show real loading and error states
 
@@ -61,7 +67,9 @@ Loom/recording link here_
 - AI confidence scores and notes: hand-authored to exercise the trust UI
 - Auth: the persona switcher stands in for login; permissions are enforced in
   the API layer (clients never receive internal threads), not by real auth
-- Persistence: corrections and replies live in React state; refresh resets them
+- Persistence: field corrections live in React state (refresh resets them);
+  messages and onboarding progress persist in localStorage — the "Reset demo"
+  button on the landing page starts everything over
 - The clock: the app lives on a fixed "today" (March 2, 2026) so deadlines read
   realistically
 

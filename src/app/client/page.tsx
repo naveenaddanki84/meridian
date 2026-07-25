@@ -130,7 +130,10 @@ export default function ClientHome() {
             {checklist.map((item) => (
               <li key={item.id}>
                 {item.done ? (
-                  <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 opacity-60">
+                  <Link
+                    href={item.href}
+                    className="group flex items-center gap-3 rounded-xl px-3 py-2.5 opacity-60 transition-opacity hover:opacity-90"
+                  >
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-verified text-white">
                       <Check className="h-3.5 w-3.5" />
                     </span>
@@ -140,7 +143,8 @@ export default function ClientHome() {
                       </span>
                       <span className="block text-[12px] text-ink-faint">{item.detail}</span>
                     </span>
-                  </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-ink-faint opacity-0 transition-opacity group-hover:opacity-100" />
+                  </Link>
                 ) : (
                   <Link
                     href={item.href}

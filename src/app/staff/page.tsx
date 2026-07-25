@@ -6,6 +6,8 @@ import { ArrowRight, ChevronRight, Sprout } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
+import { hasClientReply, useExtraMessages } from "@/lib/thread-store";
+import { HERO_RETURN_ID } from "@/data/hero";
 import { rankReturns, type PriorityReason } from "@/lib/priority";
 import { deadlineLabel, daysUntil } from "@/lib/format";
 import { stageById } from "@/data/statuses";
@@ -59,12 +61,22 @@ export default function StaffDashboard() {
     }
   }, [persona.id, persona.role]);
 
+  // If Priya replied in her own view, her preparer's queue knows about it.
+  const extraMessages = useExtraMessages();
+  const liveReturns = useMemo(() => {
+    if (!returns) return null;
+    if (!hasClientReply(extraMessages, "priya")) return returns;
+    return returns.map((r) =>
+      r.id === HERO_RETURN_ID ? { ...r, unreadClientReply: true } : r,
+    );
+  }, [returns, extraMessages]);
+
   const ranked = useMemo(() => {
-    if (!returns) return [];
+    if (!liveReturns) return [];
     const scoped =
-      scope === "mine" ? returns.filter((r) => r.assigneeId === persona.id) : returns;
+      scope === "mine" ? liveReturns.filter((r) => r.assigneeId === persona.id) : liveReturns;
     return rankReturns(scoped);
-  }, [returns, scope, persona.id]);
+  }, [liveReturns, scope, persona.id]);
 
   const waiting = ranked.filter((r) => r.ret.blockedOn === "client");
   const inReview = ranked.filter((r) => r.ret.stage === "internal_review");

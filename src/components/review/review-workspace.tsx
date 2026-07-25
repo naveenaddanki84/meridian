@@ -9,6 +9,7 @@ import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { deadlineLabel } from "@/lib/format";
 import { rememberSpot } from "@/lib/workspace-chip";
+import { addSharedMessage, useExtraMessages } from "@/lib/thread-store";
 import { stageById } from "@/data/statuses";
 import type { ReturnField, Thread, ThreadAnchor } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
@@ -54,10 +55,27 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     () => (apiFields ?? []).map((f) => fieldOverrides[f.id] ?? f),
     [apiFields, fieldOverrides],
   );
-  const threads = useMemo(
-    () => [...newThreads, ...(apiThreads ?? []).map((t) => threadOverrides[t.id] ?? t)],
-    [apiThreads, threadOverrides, newThreads],
-  );
+  // Replies written in the client's view arrive here through the shared
+  // store — the collaboration loop works across roles (Challenge 02).
+  const extraMessages = useExtraMessages();
+  const threads = useMemo(() => {
+    const merged = (apiThreads ?? []).map((t) => {
+      const base = threadOverrides[t.id] ?? t;
+      const extras = extraMessages[t.id] ?? [];
+      const known = new Set(base.messages.map((m) => m.id));
+      const fresh = extras.filter((m) => !known.has(m.id));
+      if (fresh.length === 0) return base;
+      const messages = [...base.messages, ...fresh];
+      const lastFromClient = messages[messages.length - 1].authorId === "priya";
+      return {
+        ...base,
+        messages,
+        nextActionOwner: lastFromClient ? ("staff" as const) : base.nextActionOwner,
+        status: lastFromClient ? ("open" as const) : base.status,
+      };
+    });
+    return [...newThreads, ...merged];
+  }, [apiThreads, threadOverrides, newThreads, extraMessages]);
 
   // Selection + deep links (?field= / ?doc= / ?thread=, Challenge 04)
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(
@@ -184,13 +202,18 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   const replyToThread = (threadId: string, body: string) => {
     const thread = threads.find((t) => t.id === threadId);
     if (!thread) return;
+    const message = {
+      id: `m-${Date.now()}`,
+      authorId: persona.id,
+      body,
+      sentAt: new Date().toISOString(),
+    };
+    // Client-visible replies travel to the client's view too.
+    if (thread.visibility === "client") addSharedMessage(threadId, message);
     const updated: Thread = {
       ...thread,
       nextActionOwner: thread.visibility === "client" ? "client" : "staff",
-      messages: [
-        ...thread.messages,
-        { id: `m-${Date.now()}`, authorId: persona.id, body, sentAt: new Date().toISOString() },
-      ],
+      messages: [...thread.messages, message],
     };
     if (newThreads.some((t) => t.id === threadId)) {
       setNewThreads((prev) => prev.map((t) => (t.id === threadId ? updated : t)));

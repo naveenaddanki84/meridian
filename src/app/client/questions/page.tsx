@@ -7,9 +7,10 @@ import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { readProgress, updateProgress, useClientProgress } from "@/lib/client-progress";
+import { addSharedMessage, readExtraMessages, useExtraMessages } from "@/lib/thread-store";
 import { HERO_RETURN_ID } from "@/data/hero";
 import { personaById } from "@/data/people";
-import type { Thread } from "@/data/types";
+import type { Message, Thread } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardSkeleton } from "@/components/ui/skeleton";
@@ -18,28 +19,33 @@ import { EmptyState } from "@/components/ui/empty-state";
 /**
  * The client side of collaboration (Challenge 02): only client-visible
  * threads arrive here (the API filters internal ones out, like real
- * permissions would), each pinned to the thing it's about, each clear
- * about whose move it is.
+ * permissions would). Replies go through the shared store, so they show
+ * up in the preparer's workspace — and the preparer's replies land here.
  */
 export default function ClientQuestions() {
   const { persona } = useRole();
   const isPriya = persona.id === "priya";
   const progress = useClientProgress();
+  const extras = useExtraMessages();
   const { data: apiThreads, loading } = useQuery(
     () => api.getThreads(HERO_RETURN_ID, "client"),
     [],
   );
 
-  const [answered, setAnswered] = useState<Readonly<Record<string, string>>>({});
   const [draft, setDraft] = useState("");
   const [draftThreadId, setDraftThreadId] = useState<string | null>(null);
 
-  // An answer given on a previous visit stays answered.
+  // Migration: an answer given before message-sync existed becomes a message.
   useEffect(() => {
-    if (readProgress().questionAnswered) {
-      setAnswered((prev) =>
-        prev["t-receipt"] ? prev : { ...prev, "t-receipt": "It was $300 — sorry about my handwriting!" },
-      );
+    const stored = readExtraMessages()["t-receipt"] ?? [];
+    const hasMine = stored.some((m) => m.authorId === "priya");
+    if (readProgress().questionAnswered && !hasMine) {
+      addSharedMessage("t-receipt", {
+        id: "m-migrated-receipt",
+        authorId: "priya",
+        body: "It was $300 — sorry about my handwriting!",
+        sentAt: new Date().toISOString(),
+      });
     }
   }, []);
 
@@ -55,12 +61,27 @@ export default function ClientQuestions() {
   }
 
   const threads = apiThreads ?? [];
-  const isDone = (threadId: string) =>
-    Boolean(answered[threadId]) || (threadId === "t-k1" && progress.k1Uploaded);
-  const openCount = threads.filter((t) => !isDone(t.id) && t.status !== "resolved").length;
+
+  const mergedMessages = (thread: Thread): readonly Message[] => {
+    const known = new Set(thread.messages.map((m) => m.id));
+    const fresh = (extras[thread.id] ?? []).filter((m) => !known.has(m.id));
+    return [...thread.messages, ...fresh];
+  };
+
+  const hasMyReply = (thread: Thread): boolean =>
+    mergedMessages(thread).some((m) => m.authorId === persona.id);
+
+  const isDone = (thread: Thread) =>
+    hasMyReply(thread) || (thread.id === "t-k1" && progress.k1Uploaded);
+  const openCount = threads.filter((t) => !isDone(t) && t.status !== "resolved").length;
 
   const answer = (thread: Thread, text: string) => {
-    setAnswered((prev) => ({ ...prev, [thread.id]: text }));
+    addSharedMessage(thread.id, {
+      id: `m-${Date.now()}`,
+      authorId: persona.id,
+      body: text,
+      sentAt: new Date().toISOString(),
+    });
     setDraft("");
     setDraftThreadId(null);
     if (thread.id === "t-receipt") updateProgress({ questionAnswered: true });
@@ -81,19 +102,21 @@ export default function ClientQuestions() {
 
       <ul className="space-y-3">
         {threads.map((thread) => {
-          const reply = answered[thread.id];
+          const messages = mergedMessages(thread);
+          const replied = hasMyReply(thread);
           const isReceiptQuestion = thread.id === "t-receipt";
           const isDocRequest = thread.anchor.type === "document";
           const docUploaded = isDocRequest && progress.k1Uploaded;
+          const lastMessage = messages[messages.length - 1];
 
           return (
             <li key={thread.id} className="rounded-2xl border border-line bg-card p-4 shadow-lift">
               <div className="flex items-center gap-2">
                 <Badge tone="brand">About: {thread.anchor.label}</Badge>
-                {reply || docUploaded ? (
+                {replied || docUploaded ? (
                   <Badge tone="verified">
                     <Check className="h-3 w-3" />
-                    {docUploaded && !reply ? "Done" : "Answered"}
+                    {docUploaded && !replied ? "Done" : "Answered"}
                   </Badge>
                 ) : (
                   <Badge tone="attention">Your turn</Badge>
@@ -101,9 +124,19 @@ export default function ClientQuestions() {
               </div>
 
               <ul className="mt-3 space-y-2.5">
-                {thread.messages.map((message) => {
+                {messages.map((message) => {
                   const author = personaById(message.authorId);
-                  return (
+                  const mine = message.authorId === persona.id;
+                  return mine ? (
+                    <li key={message.id} className="flex flex-row-reverse gap-2.5">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-paper text-[10px] font-bold text-ink-soft">
+                        {persona.initials}
+                      </span>
+                      <div className="rounded-xl bg-spruce-soft px-3 py-2">
+                        <p className="text-[13px] text-ink">{message.body}</p>
+                      </div>
+                    </li>
+                  ) : (
                     <li key={message.id} className="flex gap-2.5">
                       <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-spruce text-[10px] font-bold text-white">
                         {author.initials}
@@ -115,26 +148,15 @@ export default function ClientQuestions() {
                     </li>
                   );
                 })}
-
-                {reply && (
-                  <li className="flex flex-row-reverse gap-2.5">
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-paper text-[10px] font-bold text-ink-soft">
-                      {persona.initials}
-                    </span>
-                    <div className="rounded-xl bg-spruce-soft px-3 py-2">
-                      <p className="text-[13px] text-ink">{reply}</p>
-                    </div>
-                  </li>
-                )}
               </ul>
 
-              {reply && (
+              {replied && lastMessage?.authorId === persona.id && (
                 <p className="mt-3 text-[12px] text-ink-faint">
                   Sent — Marcus will update your return with this.
                 </p>
               )}
 
-              {!reply && isReceiptQuestion && (
+              {!replied && isReceiptQuestion && (
                 <div className="mt-3">
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="primary" onClick={() => answer(thread, "It was $300 — sorry about my handwriting!")}>
@@ -172,7 +194,7 @@ export default function ClientQuestions() {
                 </div>
               )}
 
-              {!reply && isDocRequest && !docUploaded && (
+              {!replied && isDocRequest && !docUploaded && (
                 <div className="mt-3">
                   <Link href="/client/documents">
                     <Button size="sm" variant="primary">Upload it now</Button>
@@ -180,7 +202,7 @@ export default function ClientQuestions() {
                 </div>
               )}
 
-              {docUploaded && !reply && (
+              {docUploaded && !replied && (
                 <p className="mt-3 flex items-center gap-1.5 text-[12px] font-semibold text-verified">
                   <Check className="h-3.5 w-3.5" />
                   You uploaded it — we&apos;ve read it already. Nothing else needed.

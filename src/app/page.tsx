@@ -47,6 +47,7 @@ export default function RolePicker() {
     try {
       window.localStorage.removeItem("meridian.persona");
       window.localStorage.removeItem("meridian.client-progress");
+      window.localStorage.removeItem("meridian.thread-messages");
       window.sessionStorage.removeItem("meridian.workspace-spot");
       setResetDone(true);
       window.setTimeout(() => setResetDone(false), 2000);

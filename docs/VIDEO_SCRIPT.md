@@ -18,9 +18,13 @@ them.
 
 > "**Challenge 03 — a first-time user knows their next action in 10 seconds.**
 > One card: '2 things need you, about 4 minutes.' Time estimates, not vague
-> tasks. Below it, status in plain English — five steps, no jargon, who's on
-> it, what's next. **[Challenge 06]** Notice what's *not* here: no confidence
-> scores, no substages. Complexity stays on the firm's side."
+> tasks. Onboarding started with 12 plain-language questions — already done,
+> and clickable —" *(click 'Tell us about your year')* "— here are her
+> answers, and notice: two of them literally became numbers on the return,
+> with receipts her preparer can trace. Back home: status in plain English —
+> five steps, no jargon, who's on it, what's next. **[Challenge 06]** Notice
+> what's *not* here: no confidence scores, no substages. Complexity stays on
+> the firm's side."
 
 ## 1:15 — Answer the question (Questions for you)
 
@@ -50,8 +54,9 @@ Click **It was $300**.
 > "Now the CPA. **Challenge 07 — 'what should I work on right now?'** This
 > queue is ranked by real logic over ~120 seeded returns — deadlines, unread
 > replies, AI flags, days blocked — and every card says *why* it's ranked
-> and what the next action is. Toggle to Whole firm: a manager sees workload
-> per preparer, overdue and blocked at a glance."
+> and what the next action is. Priya's card already says 'Client replied —
+> unread': the answer I sent a minute ago as her. Toggle to Whole firm: a
+> manager sees workload per preparer, overdue and blocked at a glance."
 
 ## 3:20 — The hero: Priya's return (open from queue)
 
@@ -80,10 +85,11 @@ Click **It was $300**.
 
 ## 5:10 — Collaboration + never getting lost
 
-> "**Challenges 02 and 04.** Conversations grouped by whose move it is —
-> 'Waiting on Priya: 2', with age. Every thread jumps to its anchor. And
-> every state here is a URL — if I wander off to Documents, this chip brings
-> me straight back to where I was."
+> "**Challenges 02 and 04.** Conversations grouped by whose move it is, with
+> age — and Priya's answer is right here in the thread, marked 'Firm's
+> move' now. The message loop works across roles. Every thread jumps to its
+> anchor. And every state here is a URL — if I wander off to Documents, this
+> chip brings me straight back to where I was."
 
 ## 5:30 — Scale (Documents + ⌘K)
 

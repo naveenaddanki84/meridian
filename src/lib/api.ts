@@ -89,10 +89,10 @@ export const api = {
       {
         id: "chk-questions",
         title: "Tell us about your year",
-        detail: "12 quick questions — done Feb 12",
+        detail: "12 quick questions — done Feb 12 · view your answers",
         minutes: 5,
         done: true,
-        href: "/client",
+        href: "/client/questionnaire",
       },
       {
         id: "chk-docs",

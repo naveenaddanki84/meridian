@@ -29,6 +29,33 @@ export const heroReturn: TaxReturn = {
   locked: false,
 };
 
+/**
+ * Day one. Dave signed up this morning and has done nothing yet — this is
+ * what the product looks like before any data exists (Challenge 03).
+ */
+export const DAVE_RETURN_ID = "ret-dave";
+
+export const daveReturn: TaxReturn = {
+  id: DAVE_RETURN_ID,
+  clientName: "Dave Peterson",
+  clientInitials: "DP",
+  year: 2025,
+  form: "1120-S",
+  stage: "getting_started",
+  substageIndex: 0,
+  deadline: "2026-03-16",
+  assigneeId: "mike",
+  blockedOn: "client",
+  blockedDays: 0,
+  docsReceived: 0,
+  docsExpected: 8,
+  openQuestions: 0,
+  aiFlags: 0,
+  unreadClientReply: false,
+  lastActivity: "2026-03-02",
+  locked: false,
+};
+
 export const heroDocuments: readonly TaxDocument[] = [
   {
     id: "doc-w2",

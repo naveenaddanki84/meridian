@@ -11,6 +11,10 @@ import { useEffect, useState } from "react";
 export interface ClientProgress {
   k1Uploaded: boolean;
   questionAnswered: boolean;
+  /** Dave's day-one questionnaire: how many questions he's answered. */
+  daveAnswered: number;
+  daveQuestionnaireDone: boolean;
+  daveDocsStarted: boolean;
 }
 
 const KEY = "meridian.client-progress";
@@ -19,6 +23,9 @@ const EVENT = "meridian-progress-change";
 const DEFAULT_PROGRESS: ClientProgress = {
   k1Uploaded: false,
   questionAnswered: false,
+  daveAnswered: 0,
+  daveQuestionnaireDone: false,
+  daveDocsStarted: false,
 };
 
 export function readProgress(): ClientProgress {
@@ -29,6 +36,9 @@ export function readProgress(): ClientProgress {
     return {
       k1Uploaded: parsed.k1Uploaded === true,
       questionAnswered: parsed.questionAnswered === true,
+      daveAnswered: typeof parsed.daveAnswered === "number" ? parsed.daveAnswered : 0,
+      daveQuestionnaireDone: parsed.daveQuestionnaireDone === true,
+      daveDocsStarted: parsed.daveDocsStarted === true,
     };
   } catch {
     return DEFAULT_PROGRESS;

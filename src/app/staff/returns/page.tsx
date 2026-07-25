@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
+import { useRole } from "@/lib/role";
+import { canOpenReturn } from "@/lib/access";
 import { deadlineLabel, daysUntil, relativeLabel } from "@/lib/format";
 import { STAGES, stageById } from "@/data/statuses";
 import type { StageId } from "@/data/types";
@@ -17,6 +19,7 @@ import { CardSkeleton } from "@/components/ui/skeleton";
  */
 export default function ReturnsList() {
   const { data: returns, loading } = useQuery(() => api.getReturns(), []);
+  const { persona } = useRole();
   const [stageFilter, setStageFilter] = useState<StageId | "all">("all");
 
   const LIST_CAP = 60;
@@ -77,14 +80,22 @@ export default function ReturnsList() {
       <ul className="overflow-hidden rounded-xl border border-line bg-card">
         {visible.map((ret) => {
           const stage = stageById(ret.stage);
+          const allowed = canOpenReturn(persona, ret);
           return (
             <li key={ret.id} className="border-b border-line last:border-b-0">
               <Link
                 href={`/staff/returns/${ret.id}`}
-                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-spruce-wash/60"
+                title={allowed ? undefined : "Not assigned to you — you can request access"}
+                className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-spruce-wash/60 ${
+                  allowed ? "" : "opacity-70"
+                }`}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spruce-soft text-[12px] font-bold text-spruce">
-                  {ret.clientInitials}
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[12px] font-bold ${
+                    allowed ? "bg-spruce-soft text-spruce" : "bg-locked-soft text-locked"
+                  }`}
+                >
+                  {allowed ? ret.clientInitials : <Lock className="h-3.5 w-3.5" />}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-semibold text-ink">
@@ -98,7 +109,8 @@ export default function ReturnsList() {
                     {relativeLabel(ret.lastActivity)}
                   </span>
                 </span>
-                {ret.blockedOn === "client" && (
+                {!allowed && <Badge tone="locked">No access</Badge>}
+                {allowed && ret.blockedOn === "client" && (
                   <Badge tone="attention">waiting {ret.blockedDays}d</Badge>
                 )}
                 <Badge tone={ret.stage === "filed" ? "verified" : "neutral"}>

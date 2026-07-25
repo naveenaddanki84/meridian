@@ -13,9 +13,9 @@ Loom/recording link here_
 
 ## The 60-second tour
 
-1. **Pick a hat** on the landing page — Emily (client) or Mike (preparer).
+1. **Pick a hat** on the landing page — six people, one product.
 2. **As Mike:** the *Today* queue says what to work on and *why* → open Emily
-   Sharma → click **Wages and salary** → a thread draws from the field to Box 1
+   Carter → click **Wages and salary** → a thread draws from the field to Box 1
    of her W-2, with a receipt-style card: what the AI read, how sure it is, and
    what to do about it → open **Charitable contributions** (amber, 62%
    confident, handwritten receipt) → *Fix it* → the correction is recorded and
@@ -23,6 +23,11 @@ Loom/recording link here_
 3. **As Emily:** "2 things need you · about 4 min" → upload the missing K-1 and
    watch it get read → answer Mike's question about the donation with one tap.
    She never sees confidence scores, substages, or internal notes.
+4. **As Dave:** day one — an account created this morning, nothing done yet.
+   Answer six plain-language questions, one at a time, and watch the home
+   screen change as onboarding completes.
+5. **As Katie (seasonal):** open a return that isn't hers and the door is
+   locked, with a working request-access flow to the firm admin.
 
 ## Challenges covered → where to look
 
@@ -32,7 +37,7 @@ Loom/recording link here_
 | 02 | Client & CPA collaboration | Conversations panel · client "Questions for you" | Threads pin to fields/documents, are marked *Firm only* vs *Client can see*, and outstanding requests are tracked — grouped by whose move it is, with age |
 | 03 | Where to start | Client home | One card: what needs you, how long it takes, in minutes — and the interface visibly changes as onboarding completes (finish both tasks and the checklist gives way to status) |
 | 04 | Getting lost | Everywhere | URL-deep-linkable state, breadcrumbs, thread→field jumps, and a "Back to Emily's return" chip that survives any detour |
-| 05 | Role-aware experiences | Role picker · persona menu · staff gate | Six personas, one shell: client, business owner, preparer, reviewer, firm admin, seasonal staff. Each lands on its own default (reviewer → review queue, admin → whole firm, seasonal → own returns only, with the limitation stated); a client hitting a firm URL gets a plain explanation, not a 404; Mike wears his client hat for his own return |
+| 05 | Role-aware experiences | Role picker · persona menu · access control | Six personas, three genuinely different staff surfaces: preparers get a ranked queue, the reviewer gets a risk-first sign-off queue, the admin gets capacity and deadline operations. Seasonal staff are scoped to assigned returns — opening anyone else's shows a locked page with a working "request access from the admin" flow. A client hitting a firm URL gets a plain explanation, not a 404; Mike wears his client hat for his own return |
 | 06 | Status & progress | Client journey card · staff stage badges | One state machine, two renderings: five plain-English steps for clients, substages for staff |
 | 07 | Actionable dashboard | Staff *Today* | Real ranking logic (deadlines, unread replies, AI flags, blocked days) over ~500 returns (Mike owns 200+) — every card shows its reasons and one next action, and firm scope adds a workload-by-preparer strip for managers |
 | 08 | Clickable vs. editable | The affordance system (Legend, top right) | Six states — AI·unverified / Check this / Needs approval / Verified / Edited / Locked — same marks on every screen; pencils appear only where editing is allowed; locks explain themselves |
@@ -58,6 +63,13 @@ Loom/recording link here_
   (localStorage stands in for the realtime backend)
 - The onboarding questionnaire is reviewable at /client/questionnaire — two
   answers literally became return values with "from your answers" receipts
+- Two client states, deliberately: Emily is mid-season (so the review
+  workspace has something to trace), Dave is on day one (so first-run can be
+  shown from zero) — his six-question onboarding is real and drives his home
+  screen, nav, and status
+- Row-level permissions: seasonal staff are scoped to assigned returns; the
+  check runs before any return data renders, and the request-access flow
+  names the admin who owns the decision
 - A typed mock-API layer (`src/lib/api.ts`) with simulated latency — screens
   show real loading and error states
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Check } from "lucide-react";
 import { useRole } from "@/lib/role";
+import { QuestionnaireRunner } from "@/components/client/questionnaire-runner";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -36,6 +37,12 @@ const ANSWERS: readonly Answer[] = [
 
 export default function ClientQuestionnaire() {
   const { persona } = useRole();
+
+  // A brand-new client actually answers the questions; a returning one
+  // reviews what they already said.
+  if (persona.id === "dave") {
+    return <QuestionnaireRunner firstName={persona.name.split(" ")[0]} />;
+  }
 
   if (persona.id !== "emily") {
     return (

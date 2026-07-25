@@ -14,6 +14,14 @@ export interface Persona {
   initials: string;
   /** A second role this person can switch into (Challenge 05). */
   alsoClientOfReturnId?: string;
+  /** The return this person owns as a client. */
+  clientReturnId?: string;
+  /**
+   * How much of the firm's work this person may open.
+   * "assigned" — only returns assigned to them (seasonal staff).
+   * "firm" — anything (default for full staff).
+   */
+  accessScope?: "assigned" | "firm";
 }
 
 export type StageId =

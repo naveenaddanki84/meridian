@@ -45,16 +45,52 @@ const MIKE_ITEMS: readonly ChecklistItem[] = [
   },
 ];
 
+/** Day one for Dave: nothing done yet, and the list says so. */
+function daveChecklist(progress: {
+  daveQuestionnaireDone: boolean;
+  daveAnswered: number;
+}): readonly ChecklistItem[] {
+  return [
+    {
+      id: "d-questions",
+      title: "Tell us about your year",
+      detail: progress.daveQuestionnaireDone
+        ? "All 6 answered — thank you!"
+        : progress.daveAnswered > 0
+          ? `${progress.daveAnswered} of 6 answered — pick up where you left off`
+          : "6 quick questions about Peterson Coffee",
+      minutes: 5,
+      done: progress.daveQuestionnaireDone,
+      href: "/client/questionnaire",
+    },
+    {
+      id: "d-docs",
+      title: "Share your business documents",
+      detail: progress.daveQuestionnaireDone
+        ? "0 of 8 uploaded — we'll tell you what's missing"
+        : "Unlocks once we know about your business",
+      minutes: 10,
+      done: false,
+      href: progress.daveQuestionnaireDone ? "/client/documents" : "/client/questionnaire",
+    },
+  ];
+}
+
 export default function ClientHome() {
   const { persona } = useRole();
   const progress = useClientProgress();
   const isEmily = persona.id === "emily";
-  const returnId = isEmily ? HERO_RETURN_ID : (persona.alsoClientOfReturnId ?? HERO_RETURN_ID);
+  const isDave = persona.id === "dave";
+  const returnId =
+    persona.clientReturnId ?? persona.alsoClientOfReturnId ?? HERO_RETURN_ID;
 
   const { data: ret, loading } = useQuery(() => api.getReturn(returnId), [returnId]);
   const { data: apiChecklist } = useQuery(
-    () => (isEmily ? api.getClientChecklist() : Promise.resolve(MIKE_ITEMS)),
-    [isEmily],
+    () =>
+      isEmily
+        ? api.getClientChecklist()
+        : Promise.resolve(isDave ? daveChecklist(progress) : MIKE_ITEMS),
+    [isEmily, isDave, progress.daveQuestionnaireDone, progress.daveAnswered],
   );
 
   // Live progress: finishing a task anywhere updates the home checklist.
@@ -69,10 +105,14 @@ export default function ClientHome() {
   const openItems = checklist.filter((item) => !item.done);
   const totalMinutes = openItems.reduce((sum, item) => sum + item.minutes, 0);
   const firstName = persona.name.split(" ")[0];
-  const preparerName = isEmily ? "Mike Sullivan, your preparer" : "Rachel Adams, your preparer";
+  const preparerName = isDave
+    ? "Mike Sullivan, your preparer"
+    : isEmily
+      ? "Mike Sullivan, your preparer"
+      : "Rachel Adams, your preparer";
 
-  // Only Emily (and Mike's personal return) are wired end-to-end.
-  if (!isEmily && !persona.alsoClientOfReturnId) {
+  // Only wired client accounts get the full experience.
+  if (!isEmily && !isDave && !persona.alsoClientOfReturnId) {
     return (
       <div className="mx-auto max-w-xl">
         <header className="mb-6">
@@ -94,7 +134,7 @@ export default function ClientHome() {
 
   return (
     <div className="mx-auto max-w-xl">
-      {!isEmily && (
+      {!isEmily && !isDave && (
         <div className="mb-4 rounded-xl border border-ai-line bg-ai-soft px-4 py-2.5 text-[13px] text-ink">
           <span className="font-semibold">Client hat on.</span> This is your own
           2025 return — firm tools are hidden here. Switch back anytime from the
@@ -102,12 +142,24 @@ export default function ClientHome() {
         </div>
       )}
 
+      {isDave && !progress.daveQuestionnaireDone && (
+        <div className="mb-4 rounded-xl border border-spruce/25 bg-spruce-wash px-4 py-2.5 text-[13px] text-ink">
+          <span className="font-semibold">Welcome to Meridian.</span> Your
+          account was created this morning — here&apos;s everything, from the
+          top.
+        </div>
+      )}
+
       <header className="mb-6">
         <h1 className="font-display text-3xl tracking-tight text-ink">
-          Good morning, {firstName}
+          {isDave && !progress.daveQuestionnaireDone
+            ? `Welcome, ${firstName}`
+            : `Good morning, ${firstName}`}
         </h1>
         <p className="mt-1 text-[13px] text-ink-soft">
-          Your 2025 tax return · prepared by {preparerName.split(",")[0]}
+          {isDave
+            ? `Peterson Coffee · 2025 ${ret?.form ?? "1120-S"} · prepared by ${preparerName.split(",")[0]}`
+            : `Your 2025 tax return · prepared by ${preparerName.split(",")[0]}`}
         </p>
       </header>
 
@@ -181,13 +233,30 @@ export default function ClientHome() {
           ret={ret}
           preparerName={preparerName}
           nextUp={
-            !isEmily
-              ? "Upload the rest of your documents so Rachel can start preparing."
-              : openItems.length === 0
-                ? "Mike double-checks your numbers, then a reviewer signs off. We'll email you when it's your turn to approve."
-                : "Once your K-1 arrives and you confirm one donation amount, Mike finishes preparing and a reviewer double-checks everything."
+            isDave
+              ? progress.daveQuestionnaireDone
+                ? "Share your documents and Mike starts building your return. We'll tell you if anything's missing."
+                : "Answer six quick questions so we know which forms your business needs. Then documents."
+              : !isEmily
+                ? "Upload the rest of your documents so Rachel can start preparing."
+                : openItems.length === 0
+                  ? "Mike double-checks your numbers, then a reviewer signs off. We'll email you when it's your turn to approve."
+                  : "Once your K-1 arrives and you confirm one donation amount, Mike finishes preparing and a reviewer double-checks everything."
           }
         />
+      )}
+
+      {/* Day one has no history — say so instead of showing an empty box. */}
+      {isDave && (
+        <section className="mt-4 rounded-2xl border border-dashed border-line-strong bg-card/50 p-5 text-center">
+          <p className="text-[13px] font-semibold text-ink">
+            Nothing has happened yet — that&apos;s normal
+          </p>
+          <p className="mx-auto mt-1 max-w-sm text-[12px] leading-relaxed text-ink-soft">
+            As soon as you answer the questions above, this space fills up with
+            every step we take on your return, in plain English.
+          </p>
+        </section>
       )}
 
       {/* What already happened — quiet, reverse-chronological comfort */}

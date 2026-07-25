@@ -11,6 +11,8 @@ import { deadlineLabel } from "@/lib/format";
 import { rememberSpot } from "@/lib/workspace-chip";
 import { addSharedMessage, addSharedThread, useExtraMessages, useExtraThreads } from "@/lib/thread-store";
 import { useToast } from "@/components/ui/toast";
+import { canOpenReturn } from "@/lib/access";
+import { AccessDenied } from "./access-denied";
 import { stageById } from "@/data/statuses";
 import type { ReturnField, Thread, ThreadAnchor } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
@@ -119,12 +121,13 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   // Arriving at the workspace at all — by deep link, search result, or a
   // click — is what makes it worth returning to (Challenge 04).
   useEffect(() => {
-    if (!ret) return;
+    // Never offer a way back into a return this person can't open.
+    if (!ret || !canOpenReturn(persona, ret)) return;
     rememberSpot({
       label: `${ret.clientName}'s return`,
       href: `${window.location.pathname}${window.location.search}`,
     });
-  }, [ret]);
+  }, [ret, persona]);
 
   // Deep links (?field=…) should open the source document too, like a click would.
   useEffect(() => {
@@ -325,6 +328,11 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
         }
       />
     );
+  }
+
+  // Permission before content: a scoped user never sees the return data.
+  if (!canOpenReturn(persona, ret)) {
+    return <AccessDenied persona={persona} ret={ret} />;
   }
 
   if ((apiFields ?? []).length === 0 && apiFields !== null) {

@@ -1,5 +1,5 @@
 import type { StageId, TaxDocument, TaxReturn } from "./types";
-import { heroDocuments, heroReturn } from "./hero";
+import { daveReturn, heroDocuments, heroReturn } from "./hero";
 
 /**
  * Deterministic fake-data generator. Seeded PRNG so the server and client
@@ -111,12 +111,12 @@ function buildReturns(): readonly TaxReturn[] {
     locked: false,
   };
 
-  return [heroReturn, ...generated, mikePersonal];
+  return [heroReturn, daveReturn, ...generated, mikePersonal];
 }
 
 function buildDocuments(returns: readonly TaxReturn[]): readonly TaxDocument[] {
   const generated = returns
-    .filter((r) => r.id !== heroReturn.id && r.id !== "ret-mike")
+    .filter((r) => r.id !== heroReturn.id && r.id !== "ret-mike" && r.id !== daveReturn.id)
     .flatMap((r) => {
       const count = randInt(5, 11);
       return Array.from({ length: count }, (_, j): TaxDocument => {

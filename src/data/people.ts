@@ -12,6 +12,7 @@ export const PERSONAS: readonly Persona[] = [
     role: "client",
     title: "Client · first tax season with the firm",
     initials: "EC",
+    clientReturnId: "ret-emily",
   },
   {
     id: "mike",
@@ -41,6 +42,7 @@ export const PERSONAS: readonly Persona[] = [
     role: "client",
     title: "Business owner · 1120-S for Peterson Coffee",
     initials: "DP",
+    clientReturnId: "ret-dave",
   },
   {
     id: "katie",
@@ -48,6 +50,7 @@ export const PERSONAS: readonly Persona[] = [
     role: "preparer",
     title: "Seasonal staff · only assigned returns",
     initials: "KB",
+    accessScope: "assigned",
   },
 ] as const;
 

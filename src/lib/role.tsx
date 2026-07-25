@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { PERSONAS, personaById } from "@/data/people";
+import { clearSpot } from "@/lib/workspace-chip";
 import type { Persona } from "@/data/types";
 
 interface RoleContextValue {
@@ -37,6 +38,8 @@ export function RoleProvider({
   const switchPersona = useCallback((id: string) => {
     if (!PERSONAS.some((p) => p.id === id)) return;
     window.localStorage.setItem(STORAGE_KEY, id);
+    // "Back to where I was" belongs to a person, not a browser tab.
+    clearSpot();
     setPersonaId(id);
   }, []);
 
@@ -56,5 +59,6 @@ export function useRole(): RoleContextValue {
 export function rememberPersona(id: string) {
   if (typeof window !== "undefined") {
     window.localStorage.setItem(STORAGE_KEY, id);
+    clearSpot();
   }
 }

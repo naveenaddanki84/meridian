@@ -13,6 +13,8 @@ import { deadlineLabel, daysUntil } from "@/lib/format";
 import { stageById } from "@/data/statuses";
 import { Badge, type Tone } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/ui/skeleton";
+import { ReviewerDashboard } from "@/components/dashboard/reviewer-dashboard";
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 
 type QueueFilter = "action" | "waiting" | "review" | "all";
 
@@ -36,6 +38,18 @@ const PREPARER_NAME: Record<string, string> = {
 };
 
 export default function StaffDashboard() {
+  const { persona } = useRole();
+  const firstName = persona.name.split(" ")[0];
+
+  // Same product, genuinely different jobs (Challenge 05 + 07): the
+  // reviewer works risk, the admin works capacity, preparers work a queue.
+  if (persona.role === "reviewer") return <ReviewerDashboard firstName={firstName} />;
+  if (persona.role === "admin") return <AdminDashboard firstName={firstName} />;
+
+  return <PreparerDashboard />;
+}
+
+function PreparerDashboard() {
   const { persona } = useRole();
   const { data: returns, loading } = useQuery(() => api.getReturns(), []);
   const [scope, setScope] = useState<"mine" | "firm">(

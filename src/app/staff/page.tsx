@@ -29,10 +29,10 @@ const REASON_TONE: Record<PriorityReason["tone"], Tone> = {
  * and what to do about it.
  */
 const PREPARER_NAME: Record<string, string> = {
-  marcus: "Marcus",
-  sofia: "Sofia",
+  mike: "Mike",
+  rachel: "Rachel",
   james: "James",
-  kim: "Kim (seasonal)",
+  katie: "Katie (seasonal)",
 };
 
 export default function StaffDashboard() {
@@ -43,7 +43,7 @@ export default function StaffDashboard() {
   );
   const [filter, setFilter] = useState<QueueFilter>("action");
 
-  const isSeasonal = persona.id === "kim";
+  const isSeasonal = persona.id === "katie";
 
   // Each role lands on its own sensible default (Challenge 05):
   // reviewers on the review queue, admins on the whole firm, seasonal
@@ -61,11 +61,11 @@ export default function StaffDashboard() {
     }
   }, [persona.id, persona.role]);
 
-  // If Priya replied in her own view, her preparer's queue knows about it.
+  // If Emily replied in her own view, her preparer's queue knows about it.
   const extraMessages = useExtraMessages();
   const liveReturns = useMemo(() => {
     if (!returns) return null;
-    if (!hasClientReply(extraMessages, "priya")) return returns;
+    if (!hasClientReply(extraMessages, "emily")) return returns;
     return returns.map((r) =>
       r.id === HERO_RETURN_ID ? { ...r, unreadClientReply: true } : r,
     );

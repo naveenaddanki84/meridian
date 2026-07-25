@@ -5,13 +5,13 @@ import type { Message } from "@/data/types";
 
 /**
  * Shared message store (Challenge 02): replies written in one role's view
- * appear in the other's — Priya's answer lands in Marcus's conversation
+ * appear in the other's — Emily's answer lands in Mike's conversation
  * panel and vice versa. localStorage stands in for the realtime backend.
  */
 
 type ExtraMessages = Readonly<Record<string, readonly Message[]>>;
 
-const KEY = "meridian.thread-messages";
+const KEY = "meridian.thread-messages.v2";
 const EVENT = "meridian-threads-change";
 
 export function readExtraMessages(): ExtraMessages {

@@ -1,7 +1,7 @@
 # Video walkthrough script (~6 minutes)
 
 Before recording: open the landing page and click **Reset demo** (bottom right)
-so Priya starts fresh. Narrate decisions, not features — say *why* after every
+so Emily starts fresh. Narrate decisions, not features — say *why* after every
 *what*. Name the challenge numbers out loud; the reviewers are scoring against
 them.
 
@@ -14,7 +14,7 @@ them.
 > I'll start as a brand-new client, then switch to her CPA. The persona picker
 > stands in for login. **[Challenge 05]**"
 
-## 0:30 — Priya, first login (Enter as Priya)
+## 0:30 — Emily, first login (Enter as Emily)
 
 > "**Challenge 03 — a first-time user knows their next action in 10 seconds.**
 > One card: '2 things need you, about 4 minutes.' Time estimates, not vague
@@ -28,7 +28,7 @@ them.
 
 ## 1:15 — Answer the question (Questions for you)
 
-> "**Challenge 02.** Marcus's question arrives pinned to the thing it's about —
+> "**Challenge 02.** Mike's question arrives pinned to the thing it's about —
 > the donation receipt — not in a generic inbox. One tap to answer. His
 > internal notes never appear here; the API filters by visibility, exactly
 > like row-level security would in production."
@@ -49,16 +49,16 @@ Click **It was $300**.
 > interface changes once onboarding is done.** Progress is shared across
 > every page."
 
-## 2:40 — Switch to Marcus (persona menu → Marcus)
+## 2:40 — Switch to Mike (persona menu → Mike)
 
 > "Now the CPA. **Challenge 07 — 'what should I work on right now?'** This
 > queue is ranked by real logic over ~120 seeded returns — deadlines, unread
 > replies, AI flags, days blocked — and every card says *why* it's ranked
-> and what the next action is. Priya's card already says 'Client replied —
+> and what the next action is. Emily's card already says 'Client replied —
 > unread': the answer I sent a minute ago as her. Toggle to Whole firm: a
 > manager sees workload per preparer, overdue and blocked at a glance."
 
-## 3:20 — The hero: Priya's return (open from queue)
+## 3:20 — The hero: Emily's return (open from queue)
 
 > "**Challenge 01 — traceability.** I click her wage figure —" *(click Wages
 > and salary)* "— and a thread literally draws to Box 1 of her W-2. The
@@ -86,7 +86,7 @@ Click **It was $300**.
 ## 5:10 — Collaboration + never getting lost
 
 > "**Challenges 02 and 04.** Conversations grouped by whose move it is, with
-> age — and Priya's answer is right here in the thread, marked 'Firm's
+> age — and Emily's answer is right here in the thread, marked 'Firm's
 > move' now. The message loop works across roles. Every thread jumps to its
 > anchor. And every state here is a URL — if I wander off to Documents, this
 > chip brings me straight back to where I was."

@@ -26,7 +26,7 @@ const FRIENDLY_READS: Record<string, readonly string[]> = {
   "doc-w2": ["Your pay this year: $85,200", "Tax your employer already sent in: $11,430"],
   "doc-1099int": ["Interest your bank paid you: $412.88"],
   "doc-1099div": ["Dividends from your investments: $1,235.10"],
-  "doc-receipt": ["Your donation to Bright Futures Fund (Marcus is confirming the amount)"],
+  "doc-receipt": ["Your donation to Bright Futures Fund (Mike is confirming the amount)"],
   "doc-prior": ["Last year's numbers, used to double-check this year's"],
 };
 
@@ -38,7 +38,7 @@ function clientStatus(doc: TaxDocument): { label: string; tone: "verified" | "ne
 
 export default function ClientDocuments() {
   const { persona } = useRole();
-  const isPriya = persona.id === "priya";
+  const isEmily = persona.id === "emily";
   const { data: documents, loading } = useQuery(
     () => api.getDocumentsForReturn(HERO_RETURN_ID),
     [],
@@ -51,12 +51,12 @@ export default function ClientDocuments() {
     if (readProgress().k1Uploaded) setUploadPhase("done");
   }, []);
 
-  if (!isPriya) {
+  if (!isEmily) {
     return (
       <div className="mx-auto max-w-xl">
         <EmptyState
           title="Your documents live here"
-          detail="In this prototype only Priya's documents are wired up end-to-end. Switch to Priya from the top-right menu to see the full experience."
+          detail="In this prototype only Emily's documents are wired up end-to-end. Switch to Emily from the top-right menu to see the full experience."
         />
       </div>
     );
@@ -150,7 +150,7 @@ export default function ClientDocuments() {
                     ))}
                   </ul>
                   <p className="mt-2 text-[11px] text-ink-faint">
-                    Read automatically — Marcus double-checks every number before your return is final.
+                    Read automatically — Mike double-checks every number before your return is final.
                   </p>
                 </div>
               )}
@@ -179,7 +179,7 @@ export default function ClientDocuments() {
                         Got it — and we&apos;ve already read it
                       </p>
                       <p className="mt-1 text-[12px] leading-relaxed text-ink-soft">
-                        We added 2 numbers from your K-1 to your return. Marcus
+                        We added 2 numbers from your K-1 to your return. Mike
                         will double-check them before anything is final — nothing
                         else is needed from you.
                       </p>

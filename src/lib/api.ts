@@ -104,7 +104,7 @@ export const api = {
       },
       {
         id: "chk-question",
-        title: "Answer Marcus's question",
+        title: "Answer Mike's question",
         detail: "One question about your donation receipt",
         minutes: 1,
         done: false,

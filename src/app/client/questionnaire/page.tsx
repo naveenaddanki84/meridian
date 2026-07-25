@@ -37,12 +37,12 @@ const ANSWERS: readonly Answer[] = [
 export default function ClientQuestionnaire() {
   const { persona } = useRole();
 
-  if (persona.id !== "priya") {
+  if (persona.id !== "emily") {
     return (
       <div className="mx-auto max-w-xl">
         <EmptyState
           title="Getting-started answers live here"
-          detail="In this prototype only Priya's questionnaire is wired up. Switch to Priya from the top-right menu to see it."
+          detail="In this prototype only Emily's questionnaire is wired up. Switch to Emily from the top-right menu to see it."
         />
       </div>
     );
@@ -95,7 +95,7 @@ export default function ClientQuestionnaire() {
       <p className="mt-4 text-center text-[12px] leading-relaxed text-ink-faint">
         Need to change an answer? Because these feed your return,{" "}
         <Link href="/client/questions" className="font-semibold text-spruce hover:underline">
-          tell Marcus
+          tell Mike
         </Link>{" "}
         and he&apos;ll update it — nothing changes silently.
       </p>

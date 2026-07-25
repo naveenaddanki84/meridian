@@ -64,7 +64,7 @@ export function NavItems({ orientation }: { orientation: "vertical" | "horizonta
 
   // The badge is live: answering or uploading clears it (Challenge 03).
   const openQuestions =
-    persona.id === "priya"
+    persona.id === "emily"
       ? (progress.questionAnswered ? 0 : 1) + (progress.k1Uploaded ? 0 : 1)
       : 0;
   const items = baseItems.map((item) =>

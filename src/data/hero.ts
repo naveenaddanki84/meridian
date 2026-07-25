@@ -1,23 +1,23 @@
 import type { Insight, ReturnField, TaxDocument, TaxReturn, Thread } from "./types";
 
 /**
- * The "hero" return: Priya Sharma's 2025 Form 1040, fully wired for the
+ * The "hero" return: Emily Carter's 2025 Form 1040, fully wired for the
  * review workspace. Every value, coordinate, and confidence score is
  * fabricated — the traceability model is what's real (Challenge 01).
  */
 
-export const HERO_RETURN_ID = "ret-priya";
+export const HERO_RETURN_ID = "ret-emily";
 
 export const heroReturn: TaxReturn = {
   id: HERO_RETURN_ID,
-  clientName: "Priya Sharma",
-  clientInitials: "PS",
+  clientName: "Emily Carter",
+  clientInitials: "EC",
   year: 2025,
   form: "1040",
   stage: "in_preparation",
   substageIndex: 1,
   deadline: "2026-04-15",
-  assigneeId: "marcus",
+  assigneeId: "mike",
   blockedOn: null,
   blockedDays: 0,
   docsReceived: 4,
@@ -33,7 +33,7 @@ export const heroDocuments: readonly TaxDocument[] = [
   {
     id: "doc-w2",
     returnId: HERO_RETURN_ID,
-    clientName: "Priya Sharma",
+    clientName: "Emily Carter",
     title: "W-2 — Lumen Health Systems",
     kind: "W-2",
     issuer: "Lumen Health Systems",
@@ -46,7 +46,7 @@ export const heroDocuments: readonly TaxDocument[] = [
       { id: "w2-employer", label: "c · Employer's name and address", page: 1, x: 2, y: 13, w: 56, h: 16, value: "Lumen Health Systems\n400 Vesey Street, New York, NY" },
       { id: "w2-box1", label: "1 · Wages, tips, other comp.", page: 1, x: 62, y: 13, w: 36, h: 7.5, value: "85,200.00" },
       { id: "w2-box2", label: "2 · Federal income tax withheld", page: 1, x: 62, y: 21.5, w: 36, h: 7.5, value: "11,430.00" },
-      { id: "w2-employee", label: "e/f · Employee's name and address", page: 1, x: 2, y: 31, w: 56, h: 16, value: "Priya Sharma\n88 Carmine Street, Apt 4B, New York, NY" },
+      { id: "w2-employee", label: "e/f · Employee's name and address", page: 1, x: 2, y: 31, w: 56, h: 16, value: "Emily Carter\n88 Carmine Street, Apt 4B, New York, NY" },
       { id: "w2-box3", label: "3 · Social security wages", page: 1, x: 62, y: 31, w: 36, h: 7.5, value: "92,100.00" },
       { id: "w2-box4", label: "4 · Social security tax withheld", page: 1, x: 62, y: 39.5, w: 36, h: 7.5, value: "5,710.20" },
       { id: "w2-box12a", label: "12a · Code D — 401(k)", page: 1, x: 2, y: 49, w: 34, h: 8, value: "6,900.00" },
@@ -58,7 +58,7 @@ export const heroDocuments: readonly TaxDocument[] = [
   {
     id: "doc-1099int",
     returnId: HERO_RETURN_ID,
-    clientName: "Priya Sharma",
+    clientName: "Emily Carter",
     title: "1099-INT — First Harbor Bank",
     kind: "1099-INT",
     issuer: "First Harbor Bank",
@@ -68,13 +68,13 @@ export const heroDocuments: readonly TaxDocument[] = [
     boxes: [
       { id: "int-payer", label: "Payer's name and address", page: 1, x: 2, y: 3, w: 54, h: 18, value: "First Harbor Bank\nPO Box 9200, Wilmington, DE" },
       { id: "int-box1", label: "1 · Interest income", page: 1, x: 60, y: 3, w: 38, h: 9, value: "412.88" },
-      { id: "int-recipient", label: "Recipient", page: 1, x: 2, y: 23, w: 54, h: 12, value: "Priya Sharma" },
+      { id: "int-recipient", label: "Recipient", page: 1, x: 2, y: 23, w: 54, h: 12, value: "Emily Carter" },
     ],
   },
   {
     id: "doc-1099div",
     returnId: HERO_RETURN_ID,
-    clientName: "Priya Sharma",
+    clientName: "Emily Carter",
     title: "1099-DIV — Vanguard Brokerage",
     kind: "1099-DIV",
     issuer: "Vanguard Brokerage",
@@ -85,13 +85,13 @@ export const heroDocuments: readonly TaxDocument[] = [
       { id: "div-payer", label: "Payer's name and address", page: 1, x: 2, y: 3, w: 54, h: 18, value: "Vanguard Brokerage Services\nPO Box 982901, El Paso, TX" },
       { id: "div-box1a", label: "1a · Total ordinary dividends", page: 1, x: 60, y: 3, w: 38, h: 9, value: "1,235.10" },
       { id: "div-box1b", label: "1b · Qualified dividends", page: 1, x: 60, y: 13, w: 38, h: 9, value: "1,180.00" },
-      { id: "div-recipient", label: "Recipient", page: 1, x: 2, y: 23, w: 54, h: 12, value: "Priya Sharma" },
+      { id: "div-recipient", label: "Recipient", page: 1, x: 2, y: 23, w: 54, h: 12, value: "Emily Carter" },
     ],
   },
   {
     id: "doc-receipt",
     returnId: HERO_RETURN_ID,
-    clientName: "Priya Sharma",
+    clientName: "Emily Carter",
     title: "Donation receipt — Bright Futures Fund",
     kind: "Receipt",
     issuer: "Bright Futures Fund",
@@ -108,7 +108,7 @@ export const heroDocuments: readonly TaxDocument[] = [
   {
     id: "doc-prior",
     returnId: HERO_RETURN_ID,
-    clientName: "Priya Sharma",
+    clientName: "Emily Carter",
     title: "2024 return — prior year (reference)",
     kind: "Prior return",
     issuer: "Self-prepared",
@@ -124,7 +124,7 @@ export const heroDocuments: readonly TaxDocument[] = [
   {
     id: "doc-k1",
     returnId: HERO_RETURN_ID,
-    clientName: "Priya Sharma",
+    clientName: "Emily Carter",
     title: "Schedule K-1 — Redwood Partners",
     kind: "K-1",
     issuer: "Redwood Partners LLC",
@@ -144,7 +144,7 @@ export const heroFields: readonly ReturnField[] = [
     formRef: "1040 · Checkbox",
     value: "Single",
     state: "verified",
-    verifiedBy: "Marcus Bell",
+    verifiedBy: "Mike Sullivan",
     source: {
       kind: "client_answer",
       clientNote: "You told us this in your getting-started questions on Feb 12.",
@@ -180,7 +180,7 @@ export const heroFields: readonly ReturnField[] = [
     formRef: "1040 · Line 2b",
     value: "$412.88",
     state: "verified",
-    verifiedBy: "Marcus Bell",
+    verifiedBy: "Mike Sullivan",
     ai: { confidence: 0.97, extractedValue: "$412.88" },
     source: { kind: "document", documentId: "doc-1099int", boxId: "int-box1", page: 1 },
   },
@@ -250,7 +250,7 @@ export const heroFields: readonly ReturnField[] = [
     source: {
       kind: "client_answer",
       clientNote:
-        "Priya reported this in her getting-started questions (Feb 12). No Form 5498 is on file yet — client-reported deductions need preparer approval before they count.",
+        "Emily reported this in her getting-started questions (Feb 12). No Form 5498 is on file yet — client-reported deductions need preparer approval before they count.",
     },
   },
   {
@@ -316,7 +316,7 @@ export const heroFields: readonly ReturnField[] = [
     formRef: "1040 · Line 26",
     value: "$0.00",
     state: "verified",
-    verifiedBy: "Marcus Bell",
+    verifiedBy: "Mike Sullivan",
     source: {
       kind: "client_answer",
       clientNote: "You told us you made no estimated payments this year (getting-started questions, Feb 12).",
@@ -347,7 +347,7 @@ export const heroInsights: readonly Insight[] = [
     returnId: HERO_RETURN_ID,
     kind: "recommendation",
     title: "Keep the standard deduction",
-    why: "Priya's itemizable expenses — the donation plus state income tax — add up to roughly $5,280, far below the $15,000 standard deduction. Itemizing would cost her money.",
+    why: "Emily's itemizable expenses — the donation plus state income tax — add up to roughly $5,280, far below the $15,000 standard deduction. Itemizing would cost her money.",
     evidence: [
       { label: "Donation · $300", documentId: "doc-receipt", boxId: "rc-amount" },
       { label: "State tax · $4,980", documentId: "doc-w2", boxId: "w2-box17" },
@@ -381,8 +381,8 @@ export const heroThreads: readonly Thread[] = [
     messages: [
       {
         id: "m1",
-        authorId: "marcus",
-        body: "Hi Priya — the amount on your Bright Futures receipt is handwritten and our reader wasn't sure about it. Was the donation $300 or $800?",
+        authorId: "mike",
+        body: "Hi Emily — the amount on your Bright Futures receipt is handwritten and our reader wasn't sure about it. Was the donation $300 or $800?",
         sentAt: "2026-03-01T10:12:00",
       },
     ],
@@ -398,7 +398,7 @@ export const heroThreads: readonly Thread[] = [
     messages: [
       {
         id: "m2",
-        authorId: "marcus",
+        authorId: "mike",
         body: "We're still waiting on your K-1 from Redwood Partners. These often arrive in mid-March — upload it here whenever it lands and we'll take it from there.",
         sentAt: "2026-02-25T15:40:00",
       },
@@ -415,13 +415,13 @@ export const heroThreads: readonly Thread[] = [
     messages: [
       {
         id: "m3",
-        authorId: "dana",
+        authorId: "sarah",
         body: "Box 12a shows $6,900 in 401(k) deferrals. Under the limit, but flag if a second W-2 shows up.",
         sentAt: "2026-02-28T09:05:00",
       },
       {
         id: "m4",
-        authorId: "marcus",
+        authorId: "mike",
         body: "Noted — only one employer this year per the questionnaire.",
         sentAt: "2026-02-28T11:22:00",
       },

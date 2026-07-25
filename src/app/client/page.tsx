@@ -22,11 +22,11 @@ import { Badge } from "@/components/ui/badge";
 const HAPPENED: readonly { date: string; text: string }[] = [
   { date: "Feb 12", text: "You answered 12 getting-started questions" },
   { date: "Feb 18", text: "We read your W-2 and pre-filled your income" },
-  { date: "Feb 24", text: "Marcus started preparing your return" },
+  { date: "Feb 24", text: "Mike started preparing your return" },
 ];
 
-/** Marcus wearing his client hat sees his own (simpler) to-dos. */
-const MARCUS_ITEMS: readonly ChecklistItem[] = [
+/** Mike wearing his client hat sees his own (simpler) to-dos. */
+const MIKE_ITEMS: readonly ChecklistItem[] = [
   {
     id: "m-docs",
     title: "Share your tax documents",
@@ -37,7 +37,7 @@ const MARCUS_ITEMS: readonly ChecklistItem[] = [
   },
   {
     id: "m-question",
-    title: "Answer Sofia's question",
+    title: "Answer Rachel's question",
     detail: "About your home office",
     minutes: 2,
     done: false,
@@ -48,31 +48,31 @@ const MARCUS_ITEMS: readonly ChecklistItem[] = [
 export default function ClientHome() {
   const { persona } = useRole();
   const progress = useClientProgress();
-  const isPriya = persona.id === "priya";
-  const returnId = isPriya ? HERO_RETURN_ID : (persona.alsoClientOfReturnId ?? HERO_RETURN_ID);
+  const isEmily = persona.id === "emily";
+  const returnId = isEmily ? HERO_RETURN_ID : (persona.alsoClientOfReturnId ?? HERO_RETURN_ID);
 
   const { data: ret, loading } = useQuery(() => api.getReturn(returnId), [returnId]);
   const { data: apiChecklist } = useQuery(
-    () => (isPriya ? api.getClientChecklist() : Promise.resolve(MARCUS_ITEMS)),
-    [isPriya],
+    () => (isEmily ? api.getClientChecklist() : Promise.resolve(MIKE_ITEMS)),
+    [isEmily],
   );
 
   // Live progress: finishing a task anywhere updates the home checklist.
   const checklist = (apiChecklist ?? []).map((item) => {
-    if (!isPriya) return item;
+    if (!isEmily) return item;
     if (item.id === "chk-docs" && progress.k1Uploaded)
       return { ...item, done: true, detail: "All 5 in — thank you!" };
     if (item.id === "chk-question" && progress.questionAnswered)
-      return { ...item, done: true, detail: "Answered — Marcus is on it" };
+      return { ...item, done: true, detail: "Answered — Mike is on it" };
     return item;
   });
   const openItems = checklist.filter((item) => !item.done);
   const totalMinutes = openItems.reduce((sum, item) => sum + item.minutes, 0);
   const firstName = persona.name.split(" ")[0];
-  const preparerName = isPriya ? "Marcus Bell, your preparer" : "Sofia Reyes, your preparer";
+  const preparerName = isEmily ? "Mike Sullivan, your preparer" : "Rachel Adams, your preparer";
 
-  // Only Priya (and Marcus's personal return) are wired end-to-end.
-  if (!isPriya && !persona.alsoClientOfReturnId) {
+  // Only Emily (and Mike's personal return) are wired end-to-end.
+  if (!isEmily && !persona.alsoClientOfReturnId) {
     return (
       <div className="mx-auto max-w-xl">
         <header className="mb-6">
@@ -83,8 +83,8 @@ export default function ClientHome() {
         <div className="rounded-2xl border border-dashed border-line-strong bg-card/60 px-6 py-10 text-center">
           <p className="font-semibold text-ink">This account isn&apos;t wired in the prototype</p>
           <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-ink-soft">
-            {firstName}&apos;s home would work exactly like Priya&apos;s — switch
-            to Priya Sharma from the top-right menu to see the full client
+            {firstName}&apos;s home would work exactly like Emily&apos;s — switch
+            to Emily Carter from the top-right menu to see the full client
             experience.
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function ClientHome() {
 
   return (
     <div className="mx-auto max-w-xl">
-      {!isPriya && (
+      {!isEmily && (
         <div className="mb-4 rounded-xl border border-ai-line bg-ai-soft px-4 py-2.5 text-[13px] text-ink">
           <span className="font-semibold">Client hat on.</span> This is your own
           2025 return — firm tools are hidden here. Switch back anytime from the
@@ -181,17 +181,17 @@ export default function ClientHome() {
           ret={ret}
           preparerName={preparerName}
           nextUp={
-            !isPriya
-              ? "Upload the rest of your documents so Sofia can start preparing."
+            !isEmily
+              ? "Upload the rest of your documents so Rachel can start preparing."
               : openItems.length === 0
-                ? "Marcus double-checks your numbers, then a reviewer signs off. We'll email you when it's your turn to approve."
-                : "Once your K-1 arrives and you confirm one donation amount, Marcus finishes preparing and a reviewer double-checks everything."
+                ? "Mike double-checks your numbers, then a reviewer signs off. We'll email you when it's your turn to approve."
+                : "Once your K-1 arrives and you confirm one donation amount, Mike finishes preparing and a reviewer double-checks everything."
           }
         />
       )}
 
       {/* What already happened — quiet, reverse-chronological comfort */}
-      {isPriya && (
+      {isEmily && (
         <section className="mt-4 rounded-2xl border border-line bg-card/60 p-5">
           <h2 className="text-[11px] font-bold uppercase tracking-wide text-ink-faint">
             What&apos;s already happened

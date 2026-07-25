@@ -1,53 +1,53 @@
 import type { Persona } from "./types";
 
 /**
- * Demo personas (Challenge 05). Priya and Marcus are fully wired;
+ * Demo personas (Challenge 05). Emily and Mike are fully wired;
  * the others exist to show the role architecture without splintering
  * the product into six apps.
  */
 export const PERSONAS: readonly Persona[] = [
   {
-    id: "priya",
-    name: "Priya Sharma",
+    id: "emily",
+    name: "Emily Carter",
     role: "client",
     title: "Client · first tax season with the firm",
-    initials: "PS",
+    initials: "EC",
   },
   {
-    id: "marcus",
-    name: "Marcus Bell",
+    id: "mike",
+    name: "Mike Sullivan",
     role: "preparer",
     title: "Senior preparer · deep in the season",
-    initials: "MB",
-    alsoClientOfReturnId: "ret-marcus",
+    initials: "MS",
+    alsoClientOfReturnId: "ret-mike",
   },
   {
-    id: "dana",
-    name: "Dana Okafor",
+    id: "sarah",
+    name: "Sarah Mitchell",
     role: "reviewer",
     title: "Reviewer · signs off before filing",
-    initials: "DO",
+    initials: "SM",
   },
   {
-    id: "ruth",
-    name: "Ruth Alvarez",
+    id: "linda",
+    name: "Linda Brooks",
     role: "admin",
     title: "Firm admin · staffing and deadlines",
-    initials: "RA",
+    initials: "LB",
   },
   {
-    id: "ben",
-    name: "Ben Carver",
+    id: "dave",
+    name: "Dave Peterson",
     role: "client",
-    title: "Business owner · 1120-S for Carver Coffee",
-    initials: "BC",
+    title: "Business owner · 1120-S for Peterson Coffee",
+    initials: "DP",
   },
   {
-    id: "kim",
-    name: "Kim Falk",
+    id: "katie",
+    name: "Katie Brennan",
     role: "preparer",
     title: "Seasonal staff · only assigned returns",
-    initials: "KF",
+    initials: "KB",
   },
 ] as const;
 

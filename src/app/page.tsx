@@ -22,14 +22,14 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 const PERSONA_BLURB: Record<string, string> = {
-  priya:
+  emily:
     "First tax season with the firm. Sees a calm home, plain-English status, and exactly what to do next.",
-  marcus:
+  mike:
     "Owns 200+ returns mid-season. Sees a prioritized queue and the deep review workspace.",
-  dana: "Second set of eyes. Same product, review-first lens.",
-  ruth: "Watches deadlines and workload across the whole firm.",
-  ben: "Business owner. Same client experience, different return.",
-  kim: "Seasonal staff. Sees only the returns assigned to her.",
+  sarah: "Second set of eyes. Same product, review-first lens.",
+  linda: "Watches deadlines and workload across the whole firm.",
+  dave: "Business owner. Same client experience, different return.",
+  katie: "Seasonal staff. Sees only the returns assigned to her.",
 };
 
 /**
@@ -37,17 +37,18 @@ const PERSONA_BLURB: Record<string, string> = {
  * (Challenge 05 — one product, many roles).
  */
 export default function RolePicker() {
-  const featured = PERSONAS.filter((p) => p.id === "priya" || p.id === "marcus");
-  const others = PERSONAS.filter((p) => p.id !== "priya" && p.id !== "marcus");
+  const featured = PERSONAS.filter((p) => p.id === "emily" || p.id === "mike");
+  const others = PERSONAS.filter((p) => p.id !== "emily" && p.id !== "mike");
   const [resetDone, setResetDone] = useState(false);
 
-  // Put the demo back to the first morning: Priya's tasks reopen, personas
+  // Put the demo back to the first morning: Emily's tasks reopen, personas
   // and "back to" chips clear. Handy for walkthroughs and re-evaluation.
   const resetDemo = () => {
     try {
       window.localStorage.removeItem("meridian.persona");
       window.localStorage.removeItem("meridian.client-progress");
       window.localStorage.removeItem("meridian.thread-messages");
+      window.localStorage.removeItem("meridian.thread-messages.v2");
       window.sessionStorage.removeItem("meridian.workspace-spot");
       setResetDone(true);
       window.setTimeout(() => setResetDone(false), 2000);

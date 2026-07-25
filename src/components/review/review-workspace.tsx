@@ -66,7 +66,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
       const fresh = extras.filter((m) => !known.has(m.id));
       if (fresh.length === 0) return base;
       const messages = [...base.messages, ...fresh];
-      const lastFromClient = messages[messages.length - 1].authorId === "priya";
+      const lastFromClient = messages[messages.length - 1].authorId === "emily";
       return {
         ...base,
         messages,
@@ -282,10 +282,10 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
         <Breadcrumbs clientName={ret.clientName} />
         <EmptyState
           title={`${ret.clientName}'s workspace isn't wired in this prototype`}
-          detail="To keep the demo honest, only Priya Sharma's return is fully traceable end-to-end. Open hers to see the review experience."
+          detail="To keep the demo honest, only Emily Carter's return is fully traceable end-to-end. Open hers to see the review experience."
           action={
-            <Link href="/staff/returns/ret-priya">
-              <Button variant="primary">Open Priya's return</Button>
+            <Link href="/staff/returns/ret-emily">
+              <Button variant="primary">Open Emily's return</Button>
             </Link>
           }
         />

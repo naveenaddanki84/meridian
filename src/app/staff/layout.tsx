@@ -3,7 +3,7 @@ import { StaffGate } from "@/components/shell/staff-gate";
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell defaultPersonaId="marcus">
+    <AppShell defaultPersonaId="mike">
       <StaffGate>{children}</StaffGate>
     </AppShell>
   );

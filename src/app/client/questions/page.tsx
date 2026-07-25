@@ -24,7 +24,7 @@ import { EmptyState } from "@/components/ui/empty-state";
  */
 export default function ClientQuestions() {
   const { persona } = useRole();
-  const isPriya = persona.id === "priya";
+  const isEmily = persona.id === "emily";
   const progress = useClientProgress();
   const extras = useExtraMessages();
   const { data: apiThreads, loading } = useQuery(
@@ -38,23 +38,23 @@ export default function ClientQuestions() {
   // Migration: an answer given before message-sync existed becomes a message.
   useEffect(() => {
     const stored = readExtraMessages()["t-receipt"] ?? [];
-    const hasMine = stored.some((m) => m.authorId === "priya");
+    const hasMine = stored.some((m) => m.authorId === "emily");
     if (readProgress().questionAnswered && !hasMine) {
       addSharedMessage("t-receipt", {
         id: "m-migrated-receipt",
-        authorId: "priya",
+        authorId: "emily",
         body: "It was $300 — sorry about my handwriting!",
         sentAt: new Date().toISOString(),
       });
     }
   }, []);
 
-  if (!isPriya) {
+  if (!isEmily) {
     return (
       <div className="mx-auto max-w-xl">
         <EmptyState
           title="Questions from your preparer land here"
-          detail="In this prototype only Priya's conversations are wired up. Switch to Priya from the top-right menu to see them."
+          detail="In this prototype only Emily's conversations are wired up. Switch to Emily from the top-right menu to see them."
         />
       </div>
     );
@@ -152,7 +152,7 @@ export default function ClientQuestions() {
 
               {replied && lastMessage?.authorId === persona.id && (
                 <p className="mt-3 text-[12px] text-ink-faint">
-                  Sent — Marcus will update your return with this.
+                  Sent — Mike will update your return with this.
                 </p>
               )}
 

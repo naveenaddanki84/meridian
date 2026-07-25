@@ -13,15 +13,15 @@ Loom/recording link here_
 
 ## The 60-second tour
 
-1. **Pick a hat** on the landing page — Priya (client) or Marcus (preparer).
-2. **As Marcus:** the *Today* queue says what to work on and *why* → open Priya
+1. **Pick a hat** on the landing page — Emily (client) or Mike (preparer).
+2. **As Mike:** the *Today* queue says what to work on and *why* → open Emily
    Sharma → click **Wages and salary** → a thread draws from the field to Box 1
    of her W-2, with a receipt-style card: what the AI read, how sure it is, and
    what to do about it → open **Charitable contributions** (amber, 62%
    confident, handwritten receipt) → *Fix it* → the correction is recorded and
    the AI's original stays on file.
-3. **As Priya:** "2 things need you · about 4 min" → upload the missing K-1 and
-   watch it get read → answer Marcus's question about the donation with one tap.
+3. **As Emily:** "2 things need you · about 4 min" → upload the missing K-1 and
+   watch it get read → answer Mike's question about the donation with one tap.
    She never sees confidence scores, substages, or internal notes.
 
 ## Challenges covered → where to look
@@ -31,10 +31,10 @@ Loom/recording link here_
 | 01 | Source traceability | Review workspace | Click any value → a drawn thread + highlighted box on the source document; calculations chain (click an input to keep tracing) |
 | 02 | Client & CPA collaboration | Conversations panel · client "Questions for you" | Threads pin to fields/documents, are marked *Firm only* vs *Client can see*, and outstanding requests are tracked — grouped by whose move it is, with age |
 | 03 | Where to start | Client home | One card: what needs you, how long it takes, in minutes — and the interface visibly changes as onboarding completes (finish both tasks and the checklist gives way to status) |
-| 04 | Getting lost | Everywhere | URL-deep-linkable state, breadcrumbs, thread→field jumps, and a "Back to Priya's return" chip that survives any detour |
-| 05 | Role-aware experiences | Role picker · persona menu · staff gate | Six personas, one shell: client, business owner, preparer, reviewer, firm admin, seasonal staff. Each lands on its own default (reviewer → review queue, admin → whole firm, seasonal → own returns only, with the limitation stated); a client hitting a firm URL gets a plain explanation, not a 404; Marcus wears his client hat for his own return |
+| 04 | Getting lost | Everywhere | URL-deep-linkable state, breadcrumbs, thread→field jumps, and a "Back to Emily's return" chip that survives any detour |
+| 05 | Role-aware experiences | Role picker · persona menu · staff gate | Six personas, one shell: client, business owner, preparer, reviewer, firm admin, seasonal staff. Each lands on its own default (reviewer → review queue, admin → whole firm, seasonal → own returns only, with the limitation stated); a client hitting a firm URL gets a plain explanation, not a 404; Mike wears his client hat for his own return |
 | 06 | Status & progress | Client journey card · staff stage badges | One state machine, two renderings: five plain-English steps for clients, substages for staff |
-| 07 | Actionable dashboard | Staff *Today* | Real ranking logic (deadlines, unread replies, AI flags, blocked days) over ~500 returns (Marcus owns 200+) — every card shows its reasons and one next action, and firm scope adds a workload-by-preparer strip for managers |
+| 07 | Actionable dashboard | Staff *Today* | Real ranking logic (deadlines, unread replies, AI flags, blocked days) over ~500 returns (Mike owns 200+) — every card shows its reasons and one next action, and firm scope adds a workload-by-preparer strip for managers |
 | 08 | Clickable vs. editable | The affordance system (Legend, top right) | Six states — AI·unverified / Check this / Needs approval / Verified / Edited / Locked — same marks on every screen; pencils appear only where editing is allowed; locks explain themselves |
 | 09 | Complexity made navigable | Documents (~4,000 seeded) · ⌘K search | Fold by client, cap what renders, cut with filters, narrow by typing; summary lists one click above full detail |
 | 10 | Trustworthy AI | AI review notes · provenance cards · client copy | Recommendations and warnings with the why, evidence chips that highlight the exact box, and uncertainty in words; corrections keep the AI's original on record; clients get plain words, never percentages |
@@ -52,8 +52,8 @@ Loom/recording link here_
   states
 - Onboarding progress is shared across pages: uploading the K-1 or answering
   the question updates the home checklist, the nav badge, and "what's next"
-- The message loop crosses roles: answer as Priya and her reply appears in
-  Marcus's conversation panel with ownership flipped to "Firm's move", and
+- The message loop crosses roles: answer as Emily and her reply appears in
+  Mike's conversation panel with ownership flipped to "Firm's move", and
   his dashboard flags "Client replied — unread"; his replies reach her view
   (localStorage stands in for the realtime backend)
 - The onboarding questionnaire is reviewable at /client/questionnaire — two

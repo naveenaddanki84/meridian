@@ -37,7 +37,7 @@ const STAGE_POOL: readonly StageId[] = [
   "filed",
 ];
 
-const PREPARERS = ["marcus", "marcus", "marcus", "sofia", "sofia", "james", "kim"] as const;
+const PREPARERS = ["mike", "mike", "mike", "rachel", "rachel", "james", "katie"] as const;
 
 function isoDay(monthIndex: number, day: number, year = 2026): string {
   const mm = String(monthIndex).padStart(2, "0");
@@ -47,7 +47,7 @@ function isoDay(monthIndex: number, day: number, year = 2026): string {
 
 /**
  * Volume matters (Ch 07/09): the brief asks for a dashboard that stays
- * usable when one person owns HUNDREDS of returns — so Marcus owns ~200
+ * usable when one person owns HUNDREDS of returns — so Mike owns ~200
  * of ~500, and the documents list runs to several thousand.
  */
 const RETURN_COUNT = 500;
@@ -90,16 +90,16 @@ function buildReturns(): readonly TaxReturn[] {
     };
   });
 
-  const marcusPersonal: TaxReturn = {
-    id: "ret-marcus",
-    clientName: "Marcus Bell",
-    clientInitials: "MB",
+  const mikePersonal: TaxReturn = {
+    id: "ret-mike",
+    clientName: "Mike Sullivan",
+    clientInitials: "MS",
     year: 2025,
     form: "1040",
     stage: "docs_needed",
     substageIndex: 1,
     deadline: isoDay(4, 15),
-    assigneeId: "sofia",
+    assigneeId: "rachel",
     blockedOn: "client",
     blockedDays: 4,
     docsReceived: 2,
@@ -111,12 +111,12 @@ function buildReturns(): readonly TaxReturn[] {
     locked: false,
   };
 
-  return [heroReturn, ...generated, marcusPersonal];
+  return [heroReturn, ...generated, mikePersonal];
 }
 
 function buildDocuments(returns: readonly TaxReturn[]): readonly TaxDocument[] {
   const generated = returns
-    .filter((r) => r.id !== heroReturn.id && r.id !== "ret-marcus")
+    .filter((r) => r.id !== heroReturn.id && r.id !== "ret-mike")
     .flatMap((r) => {
       const count = randInt(5, 11);
       return Array.from({ length: count }, (_, j): TaxDocument => {

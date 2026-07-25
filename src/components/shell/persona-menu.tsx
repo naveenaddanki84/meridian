@@ -24,7 +24,7 @@ const SHELL_HOME: Record<string, string> = {
 
 /**
  * Demo stand-in for login: switch personas to see how one product adapts
- * per role (Challenge 05). Marcus can also open his own personal return —
+ * per role (Challenge 05). Mike can also open his own personal return —
  * same person, different hat.
  */
 export function PersonaMenu() {

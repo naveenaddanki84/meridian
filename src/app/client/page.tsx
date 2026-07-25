@@ -48,16 +48,17 @@ const MIKE_ITEMS: readonly ChecklistItem[] = [
 /** Day one for Dave: nothing done yet, and the list says so. */
 function daveChecklist(progress: {
   daveQuestionnaireDone: boolean;
-  daveAnswered: number;
+  daveAnswers: Readonly<Record<string, string>>;
 }): readonly ChecklistItem[] {
+  const answered = Object.keys(progress.daveAnswers).length;
   return [
     {
       id: "d-questions",
       title: "Tell us about your year",
       detail: progress.daveQuestionnaireDone
         ? "All 6 answered — thank you!"
-        : progress.daveAnswered > 0
-          ? `${progress.daveAnswered} of 6 answered — pick up where you left off`
+        : answered > 0
+          ? `${answered} of 6 answered — pick up where you left off`
           : "6 quick questions about Peterson Coffee",
       minutes: 5,
       done: progress.daveQuestionnaireDone,
@@ -90,7 +91,12 @@ export default function ClientHome() {
       isEmily
         ? api.getClientChecklist()
         : Promise.resolve(isDave ? daveChecklist(progress) : MIKE_ITEMS),
-    [isEmily, isDave, progress.daveQuestionnaireDone, progress.daveAnswered],
+    [
+      isEmily,
+      isDave,
+      progress.daveQuestionnaireDone,
+      Object.keys(progress.daveAnswers).length,
+    ],
   );
 
   // Live progress: finishing a task anywhere updates the home checklist.

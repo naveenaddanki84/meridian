@@ -164,8 +164,12 @@ export default function ClientDocuments() {
                   {uploadPhase === "uploading" && (
                     <div>
                       <p className="text-[13px] font-semibold text-ink">Uploading…</p>
-                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line">
-                        <div className="h-full w-2/3 animate-pulse rounded-full bg-spruce" />
+                      <div
+                        className="mt-2 h-1.5 overflow-hidden rounded-full bg-line"
+                        role="progressbar"
+                        aria-label="Uploading your document"
+                      >
+                        <div className="progress-indeterminate h-full w-1/4 rounded-full bg-spruce" />
                       </div>
                     </div>
                   )}

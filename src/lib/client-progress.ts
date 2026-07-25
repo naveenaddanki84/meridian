@@ -11,8 +11,12 @@ import { useEffect, useState } from "react";
 export interface ClientProgress {
   k1Uploaded: boolean;
   questionAnswered: boolean;
-  /** Dave's day-one questionnaire: how many questions he's answered. */
-  daveAnswered: number;
+  /**
+   * Dave's day-one questionnaire. The answers themselves are the source
+   * of truth — a separate count drifts out of sync the moment someone
+   * leaves the page and comes back.
+   */
+  daveAnswers: Readonly<Record<string, string>>;
   daveQuestionnaireDone: boolean;
   daveDocsStarted: boolean;
 }
@@ -23,7 +27,7 @@ const EVENT = "meridian-progress-change";
 const DEFAULT_PROGRESS: ClientProgress = {
   k1Uploaded: false,
   questionAnswered: false,
-  daveAnswered: 0,
+  daveAnswers: {},
   daveQuestionnaireDone: false,
   daveDocsStarted: false,
 };
@@ -36,7 +40,10 @@ export function readProgress(): ClientProgress {
     return {
       k1Uploaded: parsed.k1Uploaded === true,
       questionAnswered: parsed.questionAnswered === true,
-      daveAnswered: typeof parsed.daveAnswered === "number" ? parsed.daveAnswered : 0,
+      daveAnswers:
+        parsed.daveAnswers && typeof parsed.daveAnswers === "object"
+          ? parsed.daveAnswers
+          : {},
       daveQuestionnaireDone: parsed.daveQuestionnaireDone === true,
       daveDocsStarted: parsed.daveDocsStarted === true,
     };

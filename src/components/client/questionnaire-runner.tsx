@@ -14,31 +14,39 @@ import { useToast } from "@/components/ui/toast";
  * jargon, and every question says why it's being asked.
  */
 export function QuestionnaireRunner({ firstName }: { firstName: string }) {
+  // Answers survive leaving the page, so resuming picks up where it left
+  // off instead of restarting the count.
+  const [answers, setAnswers] = useState<Readonly<Record<string, string>>>(
+    () => readProgress().daveAnswers,
+  );
   const [index, setIndex] = useState(() => {
-    const done = readProgress().daveAnswered;
-    return Math.min(done, DAVE_QUESTIONS.length - 1);
+    const stored = readProgress().daveAnswers;
+    const firstUnanswered = DAVE_QUESTIONS.findIndex((q) => !stored[q.id]);
+    return firstUnanswered === -1 ? DAVE_QUESTIONS.length - 1 : firstUnanswered;
   });
-  const [answers, setAnswers] = useState<Readonly<Record<string, string>>>({});
   const [finished, setFinished] = useState(() => readProgress().daveQuestionnaireDone);
   const { notify } = useToast();
 
   const total = DAVE_QUESTIONS.length;
   const q = DAVE_QUESTIONS[index];
   const answeredCount = Object.keys(answers).length;
-  const pct = Math.round(((finished ? total : index) / total) * 100);
+  // Progress measures work done, not how far you've scrolled — skipping
+  // a question moves you forward without moving the bar.
+  const pct = Math.round(((finished ? total : answeredCount) / total) * 100);
 
   const choose = (value: string) => {
     const next = { ...answers, [q.id]: value };
     setAnswers(next);
     const done = Object.keys(next).length;
-    updateProgress({ daveAnswered: done });
+    updateProgress({ daveAnswers: next });
 
-    if (index + 1 < total) {
-      window.setTimeout(() => setIndex(index + 1), 180);
-    } else {
-      updateProgress({ daveQuestionnaireDone: true, daveAnswered: total });
+    const nextUnanswered = DAVE_QUESTIONS.findIndex((item) => !next[item.id]);
+    if (done >= total || nextUnanswered === -1) {
+      updateProgress({ daveQuestionnaireDone: true, daveAnswers: next });
       setFinished(true);
       notify("Thanks — that's everything we needed to start");
+    } else {
+      window.setTimeout(() => setIndex(nextUnanswered), 180);
     }
   };
 
@@ -83,7 +91,10 @@ export function QuestionnaireRunner({ firstName }: { firstName: string }) {
           <p className="text-[12px] font-semibold uppercase tracking-wide text-ink-faint">
             Question {index + 1} of {total}
           </p>
-          <p className="text-[12px] text-ink-faint">about {total - index} min left</p>
+          <p className="text-[12px] text-ink-faint">
+            {answeredCount > 0 && `${answeredCount} answered · `}
+            about {Math.max(1, total - answeredCount)} min left
+          </p>
         </div>
         <div
           className="h-2 overflow-hidden rounded-full bg-line"

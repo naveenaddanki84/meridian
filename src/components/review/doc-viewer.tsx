@@ -31,12 +31,12 @@ function FormPage({
       {/* Form header */}
       <div className="flex items-start justify-between border-b border-line px-4 py-2.5">
         <div>
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink">
+          <p className="font-mono text-[12px] font-semibold uppercase tracking-wide text-ink">
             {doc.kind}
           </p>
-          <p className="text-[11px] text-ink-faint">{doc.issuer}</p>
+          <p className="text-[12px] text-ink-faint">{doc.issuer}</p>
         </div>
-        <p className="font-mono text-[11px] text-ink-faint">
+        <p className="font-mono text-[12px] text-ink-faint">
           Tax year 2025 · p.{page}/{doc.pages}
         </p>
       </div>
@@ -67,11 +67,11 @@ function FormPage({
                   : {}),
               }}
             >
-              <p className="truncate text-[9px] font-medium uppercase tracking-wide text-ink-faint">
+              <p className="truncate text-[12px] font-medium uppercase tracking-wide text-ink-faint">
                 {box.label}
               </p>
               <p
-                className={`whitespace-pre-line text-[11px] leading-snug ${
+                className={`whitespace-pre-line text-[12px] leading-snug ${
                   isReceipt
                     ? "font-display italic text-ink"
                     : "font-mono text-ink"

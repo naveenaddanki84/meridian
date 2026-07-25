@@ -6,7 +6,7 @@
   --color-card: #ffffff;
   --color-ink: #1c2321;
   --color-ink-soft: #56605b;
-  --color-ink-faint: #8a948e;
+  --color-ink-faint: #697370;
   --color-line: #e5e3db;
   --color-line-strong: #cfccc2;
 
@@ -20,13 +20,13 @@
   --color-ai: #5b5bd6;
   --color-ai-soft: #eeeefb;
   --color-ai-line: #c9c9f2;
-  --color-verified: #2e7d4f;
+  --color-verified: #276742;
   --color-verified-soft: #e6f2ea;
   --color-attention: #b45309;
   --color-attention-soft: #fdf1e3;
   --color-danger: #b3261e;
   --color-danger-soft: #f9e8e6;
-  --color-locked: #6e7674;
+  --color-locked: #5a625f;
   --color-locked-soft: #eeeeea;
 
   /* type */
@@ -43,6 +43,31 @@ body {
   color: #1c2321;
   font-family: var(--font-public-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Tailwind v4 dropped cursor:pointer from the button reset — put it back,
+   so everything clickable says so. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+label[for] {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Touch targets: on coarse pointers every control clears 44px without
+   changing the tuned desktop density. */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a[href] {
+    min-height: 44px;
+  }
+  .tap-exempt {
+    min-height: 0;
+  }
 }
 
 /* figures always tabular */

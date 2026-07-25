@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useToast } from "@/components/ui/toast";
 
 /**
  * The client side of collaboration (Challenge 02): only client-visible
@@ -27,6 +28,7 @@ export default function ClientQuestions() {
   const isEmily = persona.id === "emily";
   const progress = useClientProgress();
   const extras = useExtraMessages();
+  const { notify } = useToast();
   const { data: apiThreads, loading } = useQuery(
     () => api.getThreads(HERO_RETURN_ID, "client"),
     [],
@@ -85,6 +87,7 @@ export default function ClientQuestions() {
     setDraft("");
     setDraftThreadId(null);
     if (thread.id === "t-receipt") updateProgress({ questionAnswered: true });
+    notify("Answer sent to Mike");
   };
 
   return (
@@ -129,7 +132,7 @@ export default function ClientQuestions() {
                   const mine = message.authorId === persona.id;
                   return mine ? (
                     <li key={message.id} className="flex flex-row-reverse gap-2.5">
-                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-paper text-[10px] font-bold text-ink-soft">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-paper text-[12px] font-bold text-ink-soft">
                         {persona.initials}
                       </span>
                       <div className="rounded-xl bg-spruce-soft px-3 py-2">
@@ -138,11 +141,11 @@ export default function ClientQuestions() {
                     </li>
                   ) : (
                     <li key={message.id} className="flex gap-2.5">
-                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-spruce text-[10px] font-bold text-white">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-spruce text-[12px] font-bold text-white">
                         {author.initials}
                       </span>
                       <div>
-                        <p className="text-[11px] text-ink-faint">{author.name}</p>
+                        <p className="text-[12px] text-ink-faint">{author.name}</p>
                         <p className="text-[13px] leading-relaxed text-ink-soft">{message.body}</p>
                       </div>
                     </li>
@@ -213,7 +216,7 @@ export default function ClientQuestions() {
         })}
       </ul>
 
-      <p className="mt-4 text-center text-[11px] leading-relaxed text-ink-faint">
+      <p className="mt-4 text-center text-[12px] leading-relaxed text-ink-faint">
         Your preparer&apos;s internal notes never appear here — you only see
         what&apos;s addressed to you.
       </p>

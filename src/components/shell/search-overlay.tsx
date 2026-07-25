@@ -91,7 +91,7 @@ export function SearchOverlay({
             className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-ink-faint"
             aria-label="Search"
           />
-          <kbd className="hidden rounded border border-line px-1.5 py-0.5 text-[11px] text-ink-faint sm:block">
+          <kbd className="hidden rounded border border-line px-1.5 py-0.5 text-[12px] text-ink-faint sm:block">
             esc
           </kbd>
         </div>
@@ -113,7 +113,7 @@ export function SearchOverlay({
 
           {grouped.map((group) => (
             <div key={group.type} className="mb-1">
-              <p className="px-3 pb-1 pt-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">
+              <p className="px-3 pb-1 pt-2 text-[12px] font-bold uppercase tracking-wide text-ink-faint">
                 {TYPE_LABEL[group.type]}
               </p>
               {group.items.map((item) => {
@@ -133,7 +133,7 @@ export function SearchOverlay({
                       <span className="block truncate text-[13px] font-semibold text-ink">
                         {item.title}
                       </span>
-                      <span className="block truncate text-[11px] text-ink-faint">
+                      <span className="block truncate text-[12px] text-ink-faint">
                         {item.subtitle}
                       </span>
                     </span>

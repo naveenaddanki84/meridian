@@ -107,7 +107,7 @@ export function ProvenanceCard({
                 </li>
               ))}
             </ul>
-            <p className="mt-1.5 text-[11px] text-ink-faint">
+            <p className="mt-1.5 text-[12px] text-ink-faint">
               Click an input to keep tracing — every part has its own receipt.
             </p>
           </div>

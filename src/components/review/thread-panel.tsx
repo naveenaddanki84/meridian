@@ -89,7 +89,7 @@ export function ThreadPanel({
       <div className="flex items-center justify-between border-b border-line pb-3">
         <div>
           <h2 className="font-display text-lg text-ink">Conversations</h2>
-          <p className="text-[11px] text-ink-faint">
+          <p className="text-[12px] text-ink-faint">
             Pinned to the work — nothing gets lost in email
           </p>
         </div>
@@ -143,7 +143,7 @@ export function ThreadPanel({
               </button>
             </div>
             {newVisibility === "internal" && (
-              <p className="mt-1.5 text-[11px] text-ink-faint">
+              <p className="mt-1.5 text-[12px] text-ink-faint">
                 {clientFirstName} will never see internal notes.
               </p>
             )}
@@ -178,7 +178,7 @@ export function ThreadPanel({
 
         {groups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1.5 mt-1 px-0.5 text-[11px] font-bold uppercase tracking-wide text-ink-faint">
+            <p className="mb-1.5 mt-1 px-0.5 text-[12px] font-bold uppercase tracking-wide text-ink-faint">
               {group.label} · {group.items.length}
             </p>
             <div className="space-y-2.5">
@@ -206,7 +206,7 @@ export function ThreadPanel({
                 <span className="text-[13px] font-semibold leading-snug text-ink">
                   {thread.subject}
                 </span>
-                <span className="text-[11px] text-ink-faint">
+                <span className="text-[12px] text-ink-faint">
                   last message {askedAgo(thread)}
                 </span>
               </button>
@@ -226,11 +226,11 @@ export function ThreadPanel({
                       const author = personaById(message.authorId);
                       return (
                         <li key={message.id} className="flex gap-2">
-                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-paper text-[9px] font-bold text-ink-soft">
+                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-paper text-[12px] font-bold text-ink-soft">
                             {author.initials}
                           </span>
                           <div>
-                            <p className="text-[11px] text-ink-faint">
+                            <p className="text-[12px] text-ink-faint">
                               <span className="font-semibold text-ink">{author.name}</span>
                             </p>
                             <p className="text-[13px] leading-relaxed text-ink-soft">

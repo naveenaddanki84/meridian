@@ -37,7 +37,7 @@ export function InsightCards({
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "" : "-rotate-90"}`} />
         AI review notes
         {pending.length > 0 && (
-          <span className="rounded-full bg-ai-soft px-1.5 text-[11px] font-bold text-ai">
+          <span className="rounded-full bg-ai-soft px-1.5 text-[12px] font-bold text-ai">
             {pending.length}
           </span>
         )}
@@ -78,7 +78,7 @@ export function InsightCards({
                           onClick={() =>
                             ev.documentId && ev.boxId && onShowEvidence(ev.documentId, ev.boxId)
                           }
-                          className="rounded-md bg-spruce-soft px-2 py-0.5 font-mono text-[11px] font-semibold text-spruce hover:bg-spruce/15 disabled:pointer-events-none"
+                          className="rounded-md bg-spruce-soft px-2 py-0.5 font-mono text-[12px] font-semibold text-spruce hover:bg-spruce/15 disabled:pointer-events-none"
                           title="Show on the document"
                         >
                           {ev.label}
@@ -87,7 +87,7 @@ export function InsightCards({
                     </div>
 
                     {insight.caveat && (
-                      <p className="mt-1.5 text-[11px] italic text-ink-faint">{insight.caveat}</p>
+                      <p className="mt-1.5 text-[12px] italic text-ink-faint">{insight.caveat}</p>
                     )}
 
                     <div className="mt-2">

@@ -83,17 +83,17 @@ export default function ReturnsList() {
                 href={`/staff/returns/${ret.id}`}
                 className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-spruce-wash/60"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spruce-soft text-[10px] font-bold text-spruce">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spruce-soft text-[12px] font-bold text-spruce">
                   {ret.clientInitials}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-semibold text-ink">
                     {ret.clientName}
-                    <span className="ml-2 font-mono text-[11px] font-normal text-ink-faint">
+                    <span className="ml-2 font-mono text-[12px] font-normal text-ink-faint">
                       {ret.year} {ret.form}
                     </span>
                   </span>
-                  <span className="block text-[11px] text-ink-faint">
+                  <span className="block text-[12px] text-ink-faint">
                     {ret.docsReceived}/{ret.docsExpected} docs · last activity{" "}
                     {relativeLabel(ret.lastActivity)}
                   </span>

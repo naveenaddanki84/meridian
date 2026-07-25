@@ -37,7 +37,7 @@ export function FieldList({
     <div className="min-h-0 flex-1 overflow-y-auto pr-1" data-pane="fields">
       {sections.map((section) => (
         <section key={section} className="mb-5">
-          <h3 className="mb-1.5 px-2 text-[11px] font-bold uppercase tracking-wider text-ink-faint">
+          <h3 className="mb-1.5 px-2 text-[12px] font-bold uppercase tracking-wider text-ink-faint">
             {section}
           </h3>
           <div className="rounded-xl border border-line bg-card/70">
@@ -77,13 +77,13 @@ export function FieldList({
                         <span className="block truncate text-[13px] font-semibold text-ink">
                           {field.label}
                         </span>
-                        <span className="block font-mono text-[10px] uppercase tracking-wide text-ink-faint">
+                        <span className="block font-mono text-[12px] uppercase tracking-wide text-ink-faint">
                           {field.formRef}
                         </span>
                       </span>
 
                       {threadCount > 0 && (
-                        <span className="flex items-center gap-0.5 text-[11px] font-semibold text-ink-faint">
+                        <span className="flex items-center gap-0.5 text-[12px] font-semibold text-ink-faint">
                           <MessageCircle className="h-3.5 w-3.5" />
                           {threadCount}
                         </span>

@@ -155,7 +155,7 @@ export default function ClientHome() {
                       <span className="block text-[14px] font-semibold text-ink">{item.title}</span>
                       <span className="block text-[12px] text-ink-soft">{item.detail}</span>
                     </span>
-                    <span className="text-[11px] font-semibold text-ink-faint">
+                    <span className="text-[12px] font-semibold text-ink-faint">
                       {item.minutes} min
                     </span>
                     <ChevronRight className="h-4 w-4 shrink-0 text-spruce transition-transform group-hover:translate-x-0.5" />
@@ -193,13 +193,13 @@ export default function ClientHome() {
       {/* What already happened — quiet, reverse-chronological comfort */}
       {isEmily && (
         <section className="mt-4 rounded-2xl border border-line bg-card/60 p-5">
-          <h2 className="text-[11px] font-bold uppercase tracking-wide text-ink-faint">
+          <h2 className="text-[12px] font-bold uppercase tracking-wide text-ink-faint">
             What&apos;s already happened
           </h2>
           <ul className="mt-3 space-y-2.5">
             {[...HAPPENED].reverse().map((event) => (
               <li key={event.text} className="flex gap-3 text-[13px]">
-                <span className="w-12 shrink-0 font-mono text-[11px] text-ink-faint">
+                <span className="w-12 shrink-0 font-mono text-[12px] text-ink-faint">
                   {event.date}
                 </span>
                 <span className="text-ink-soft">{event.text}</span>

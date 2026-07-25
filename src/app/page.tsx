@@ -108,14 +108,14 @@ export default function RolePicker() {
               key={p.id}
               href={SHELL_HOME[p.role]}
               onClick={() => rememberPersona(p.id)}
-              className="group flex items-center gap-3 rounded-2xl border border-line bg-card/60 px-5 py-3.5 transition-colors hover:border-spruce/40 hover:bg-card"
+              className="group flex min-w-0 items-center gap-3 rounded-2xl border border-line bg-card/60 px-5 py-3.5 transition-colors hover:border-spruce/40 hover:bg-card"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-paper text-[11px] font-bold text-ink-soft">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-paper text-[12px] font-bold text-ink-soft">
                 {p.initials}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
-                <span className="block truncate text-[11px] text-ink-faint">
+                <span className="block truncate text-[12px] text-ink-faint">
                   {PERSONA_BLURB[p.id]}
                 </span>
               </span>
@@ -125,7 +125,7 @@ export default function RolePicker() {
         </div>
       </main>
 
-      <footer className="flex flex-wrap items-center justify-between gap-3 text-[11px] leading-relaxed text-ink-faint">
+      <footer className="flex flex-wrap items-center justify-between gap-3 text-[12px] leading-relaxed text-ink-faint">
         <span className="max-w-md">
           Built for the AI Engineer case study. Every name, number, and AI output
           is fabricated; the interactions are real. No real tax advice lives here.

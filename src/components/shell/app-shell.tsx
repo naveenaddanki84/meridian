@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CornerUpLeft, Search, X } from "lucide-react";
 import { RoleProvider, useRole } from "@/lib/role";
 import { clearSpot, recallSpot, type WorkspaceSpot } from "@/lib/workspace-chip";
+import { ToastProvider } from "@/components/ui/toast";
 import { LegendButton } from "./legend";
 import { NavItems, Wordmark } from "./nav-rail";
 import { PersonaMenu } from "./persona-menu";
@@ -80,7 +81,7 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
           <Wordmark />
         </Link>
         <NavItems orientation="vertical" />
-        <p className="mt-auto text-[11px] leading-relaxed text-ink-faint">
+        <p className="mt-auto text-[12px] leading-relaxed text-ink-faint">
           Prototype — all data is fabricated. Numbers, names, and AI output are
           simulated.
         </p>
@@ -104,7 +105,7 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
                 >
                   <Search className="h-4 w-4" />
                   <span className="hidden lg:inline">Search anything…</span>
-                  <kbd className="hidden rounded border border-line px-1 text-[10px] lg:inline">
+                  <kbd className="hidden rounded border border-line px-1 text-[12px] lg:inline">
                     ⌘K
                   </kbd>
                 </button>
@@ -141,7 +142,9 @@ export function AppShell({
 }) {
   return (
     <RoleProvider defaultPersonaId={defaultPersonaId}>
-      <ShellFrame>{children}</ShellFrame>
+      <ToastProvider>
+        <ShellFrame>{children}</ShellFrame>
+      </ToastProvider>
     </RoleProvider>
   );
 }

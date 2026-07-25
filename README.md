@@ -92,6 +92,24 @@ Loom/recording link here_
   identically everywhere, and the Legend documents the language in-product.
 - **Corrections don't argue.** Fixing an AI value takes one input; the original
   extraction stays visible on the record. The AI never defends itself.
+- **Nothing changes silently.** Verifying, approving, correcting, or sending a
+  message raises a confirmation in a polite `aria-live` region — with Undo on
+  anything that altered a number, so review never feels risky.
+
+## Accessibility
+
+Audited programmatically, not by eye: every text/background pair on all 9
+routes was measured at both 1440px and 390px.
+
+- **WCAG AA contrast** everywhere — the audit initially failed (the muted text
+  token was 2.90:1), so the palette was corrected to pass at 4.5:1+
+- **No text below 12px**, tabular figures for all money
+- **Every control has an accessible name**; icon-only buttons carry `aria-label`
+- **Keyboard**: visible focus rings (never removed), logical tab order, Escape
+  closes overlays, ⌘K opens search
+- **No horizontal scroll** at any tested viewport; 44px touch targets on coarse
+  pointers
+- **`prefers-reduced-motion`** honored; all transitions 150–300ms
 
 ## Run locally
 

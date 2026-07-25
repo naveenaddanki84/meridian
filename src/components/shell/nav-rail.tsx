@@ -98,7 +98,7 @@ export function NavItems({ orientation }: { orientation: "vertical" | "horizonta
             {item.label}
             {item.badge != null && item.badge > 0 && (
               <span
-                className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold ${
+                className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[12px] font-bold ${
                   active ? "bg-white/20 text-white" : "bg-attention-soft text-attention"
                 }`}
               >

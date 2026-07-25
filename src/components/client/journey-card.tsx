@@ -48,7 +48,7 @@ export function JourneyCard({
                   className={`h-0.5 flex-1 ${index === 0 ? "invisible" : done || current ? "bg-spruce" : "bg-line"}`}
                 />
                 <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[11px] font-bold transition-colors ${
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[12px] font-bold transition-colors ${
                     done
                       ? "border-spruce bg-spruce text-white"
                       : current
@@ -63,7 +63,7 @@ export function JourneyCard({
                 />
               </div>
               <span
-                className={`px-1 text-center text-[11px] leading-tight ${
+                className={`px-1 text-center text-[12px] leading-tight ${
                   current ? "font-bold text-ink" : "font-medium text-ink-faint"
                 }`}
               >
@@ -76,13 +76,13 @@ export function JourneyCard({
 
       <dl className="mt-5 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
         <div>
-          <dt className="text-[11px] font-bold uppercase tracking-wide text-ink-faint">
+          <dt className="text-[12px] font-bold uppercase tracking-wide text-ink-faint">
             Who&apos;s on it
           </dt>
           <dd className="mt-0.5 text-[13px] font-semibold text-ink">{preparerName}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold uppercase tracking-wide text-ink-faint">
+          <dt className="text-[12px] font-bold uppercase tracking-wide text-ink-faint">
             What&apos;s next
           </dt>
           <dd className="mt-0.5 text-[13px] leading-relaxed text-ink-soft">{nextUp}</dd>

@@ -159,7 +159,7 @@ export default function StaffDashboard() {
                 <Badge tone="danger">{stats.overdue} overdue</Badge>
               )}
               {stats.blocked > 0 && (
-                <span className="text-[11px] text-ink-faint">
+                <span className="text-[12px] text-ink-faint">
                   {stats.blocked} waiting on clients
                 </span>
               )}
@@ -215,17 +215,17 @@ export default function StaffDashboard() {
                 <span className="hidden w-5 text-center font-mono text-[12px] text-ink-faint sm:block">
                   {index + 1}
                 </span>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-spruce-soft text-[11px] font-bold text-spruce">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-spruce-soft text-[12px] font-bold text-spruce">
                   {ret.clientInitials}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-baseline gap-x-2">
                     <span className="text-[14px] font-semibold text-ink">{ret.clientName}</span>
-                    <span className="font-mono text-[11px] text-ink-faint">
+                    <span className="font-mono text-[12px] text-ink-faint">
                       {ret.year} {ret.form}
                     </span>
                     {scope === "firm" && (
-                      <span className="text-[11px] text-ink-faint">· {ret.assigneeId}</span>
+                      <span className="text-[12px] text-ink-faint">· {ret.assigneeId}</span>
                     )}
                   </span>
                   <span className="mt-1 flex flex-wrap items-center gap-1.5">
@@ -293,7 +293,7 @@ function FilterTile({
     >
       <span className="tnum block font-mono text-2xl font-semibold">{value}</span>
       <span
-        className={`block text-[11px] font-semibold ${active ? "text-white/80" : "text-ink-faint"}`}
+        className={`block text-[12px] font-semibold ${active ? "text-white/80" : "text-ink-faint"}`}
       >
         {label}
       </span>

@@ -102,7 +102,7 @@ export default function StaffDocuments() {
               type="button"
               onClick={() => setKind(kind === k ? null : k)}
               aria-pressed={kind === k}
-              className={`rounded-full border px-3 py-1 font-mono text-[11px] font-semibold transition-colors ${
+              className={`rounded-full border px-3 py-1 font-mono text-[12px] font-semibold transition-colors ${
                 kind === k
                   ? "border-spruce bg-spruce text-white"
                   : "border-line bg-card text-ink-soft hover:border-line-strong"
@@ -118,7 +118,7 @@ export default function StaffDocuments() {
               type="button"
               onClick={() => setStatus(status === s ? null : s)}
               aria-pressed={status === s}
-              className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors ${
+              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition-colors ${
                 status === s
                   ? "border-spruce bg-spruce text-white"
                   : "border-line bg-card text-ink-soft hover:border-line-strong"
@@ -157,7 +157,7 @@ export default function StaffDocuments() {
                 )}
                 <span className="flex-1 text-[13px] font-semibold text-ink">{clientName}</span>
                 {missing > 0 && <Badge tone="attention">{missing} missing</Badge>}
-                <span className="font-mono text-[11px] text-ink-faint">{docs.length} docs</span>
+                <span className="font-mono text-[12px] text-ink-faint">{docs.length} docs</span>
               </button>
 
               {open && (
@@ -169,7 +169,7 @@ export default function StaffDocuments() {
                       <>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[13px] text-ink">{doc.title}</span>
-                          <span className="block text-[11px] text-ink-faint">
+                          <span className="block text-[12px] text-ink-faint">
                             {doc.uploadedAt
                               ? `Uploaded ${relativeLabel(doc.uploadedAt)} · ${doc.pages} page${doc.pages > 1 ? "s" : ""}`
                               : "Not received"}

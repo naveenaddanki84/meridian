@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useToast } from "@/components/ui/toast";
 
 /**
  * Documents in client language (Challenges 03 + 10): what we have, what
@@ -45,6 +46,7 @@ export default function ClientDocuments() {
   );
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("idle");
+  const { notify } = useToast();
 
   // If the K-1 was uploaded on a previous visit, keep it uploaded.
   useEffect(() => {
@@ -68,6 +70,7 @@ export default function ClientDocuments() {
     setTimeout(() => {
       setUploadPhase("done");
       updateProgress({ k1Uploaded: true });
+      notify("K-1 uploaded and read — nothing else needed");
     }, 2400);
   };
 
@@ -149,7 +152,7 @@ export default function ClientDocuments() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-2 text-[11px] text-ink-faint">
+                  <p className="mt-2 text-[12px] text-ink-faint">
                     Read automatically — Mike double-checks every number before your return is final.
                   </p>
                 </div>
@@ -192,7 +195,7 @@ export default function ClientDocuments() {
         })}
       </ul>
 
-      <p className="mt-4 text-center text-[11px] text-ink-faint">
+      <p className="mt-4 text-center text-[12px] text-ink-faint">
         In the real product you&apos;d drag files here or snap a photo from your
         phone. This upload is simulated.
       </p>

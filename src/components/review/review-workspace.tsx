@@ -10,6 +10,7 @@ import { useRole } from "@/lib/role";
 import { deadlineLabel } from "@/lib/format";
 import { rememberSpot } from "@/lib/workspace-chip";
 import { addSharedMessage, useExtraMessages } from "@/lib/thread-store";
+import { useToast } from "@/components/ui/toast";
 import { stageById } from "@/data/statuses";
 import type { ReturnField, Thread, ThreadAnchor } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +40,7 @@ const TRACE_COLOR: Record<string, string> = {
 export function ReviewWorkspace({ returnId }: { returnId: string }) {
   const searchParams = useSearchParams();
   const { persona } = useRole();
+  const { notify } = useToast();
 
   const { data: ret, loading: retLoading } = useQuery(() => api.getReturn(returnId), [returnId]);
   const { data: apiFields } = useQuery(() => api.getFields(returnId), [returnId]);
@@ -181,11 +183,32 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     [fields],
   );
 
-  const verifyField = (id: string) =>
-    updateField(id, { state: "verified", verifiedBy: persona.name });
+  /** Restore a field to exactly how it was — powers toast undo. */
+  const restoreField = useCallback((snapshot: ReturnField) => {
+    setFieldOverrides((prev) => ({ ...prev, [snapshot.id]: snapshot }));
+  }, []);
 
-  const correctField = (id: string, value: string) =>
+  const verifyField = (id: string) => {
+    const before = fields.find((f) => f.id === id);
+    if (!before) return;
+    const approving = before.state === "needs_approval";
+    updateField(id, { state: "verified", verifiedBy: persona.name });
+    notify(
+      approving
+        ? `Approved ${before.label.toLowerCase()}`
+        : `Verified ${before.label.toLowerCase()}`,
+      { undo: () => restoreField(before) },
+    );
+  };
+
+  const correctField = (id: string, value: string) => {
+    const before = fields.find((f) => f.id === id);
+    if (!before) return;
     updateField(id, { state: "edited", value, editedBy: persona.name });
+    notify(`${before.label} corrected to ${value}`, {
+      undo: () => restoreField(before),
+    });
+  };
 
   const askClient = (fieldId: string) => {
     const field = fields.find((f) => f.id === fieldId);
@@ -220,6 +243,12 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     } else {
       setThreadOverrides((prev) => ({ ...prev, [threadId]: updated }));
     }
+    notify(
+      thread.visibility === "client"
+        ? `Reply sent to ${ret?.clientName.split(" ")[0] ?? "the client"}`
+        : "Internal note added",
+      { tone: "info" },
+    );
   };
 
   const createThread = (anchor: ThreadAnchor, visibility: Thread["visibility"], body: string) => {
@@ -237,6 +266,12 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     };
     setNewThreads((prev) => [thread, ...prev]);
     setNewAnchor(null);
+    notify(
+      visibility === "client"
+        ? `Question sent — waiting on ${ret?.clientName.split(" ")[0] ?? "the client"}`
+        : "Internal note saved — the client can't see it",
+      { tone: "info" },
+    );
   };
 
   // The verification workflow (Ch 10): everything awaiting a human forms a queue.
@@ -324,7 +359,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
             <Button size="sm" onClick={stepToNextUnchecked}>
               <ScanSearch className="h-3.5 w-3.5 text-ai" />
               Review next flagged value
-              <span className="rounded-full bg-ai-soft px-1.5 text-[11px] font-bold text-ai">
+              <span className="rounded-full bg-ai-soft px-1.5 text-[12px] font-bold text-ai">
                 {uncheckedFields.length}
               </span>
             </Button>
@@ -334,7 +369,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
           <Button size="sm" onClick={() => setPanelOpen((v) => !v)}>
             <MessageCircle className="h-3.5 w-3.5" />
             Conversations
-            <span className="rounded-full bg-paper px-1.5 text-[11px] font-bold text-ink-soft">
+            <span className="rounded-full bg-paper px-1.5 text-[12px] font-bold text-ink-soft">
               {threads.length}
             </span>
           </Button>
@@ -345,7 +380,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
 
       {/* Workspace body */}
       <div ref={containerRef} className="relative flex min-h-0 flex-1 gap-6">
-        <div className="flex min-h-0 flex-1 flex-col lg:max-w-[46%]">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:max-w-[46%]">
           <FieldList
             fields={fields}
             threads={threads}

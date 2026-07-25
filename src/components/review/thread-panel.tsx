@@ -206,6 +206,17 @@ export function ThreadPanel({
                 <span className="text-[13px] font-semibold leading-snug text-ink">
                   {thread.subject}
                 </span>
+                {(() => {
+                  const last = thread.messages[thread.messages.length - 1];
+                  if (!last) return null;
+                  const who = personaById(last.authorId);
+                  return (
+                    <span className="line-clamp-1 text-[12px] text-ink-soft">
+                      <span className="font-semibold">{who.name.split(" ")[0]}:</span>{" "}
+                      {last.body}
+                    </span>
+                  );
+                })()}
                 <span className="text-[12px] text-ink-faint">
                   last message {askedAgo(thread)}
                 </span>

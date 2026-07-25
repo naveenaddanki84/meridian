@@ -7,7 +7,12 @@ import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { readProgress, updateProgress, useClientProgress } from "@/lib/client-progress";
-import { addSharedMessage, readExtraMessages, useExtraMessages } from "@/lib/thread-store";
+import {
+  addSharedMessage,
+  readExtraMessages,
+  useExtraMessages,
+  useExtraThreads,
+} from "@/lib/thread-store";
 import { HERO_RETURN_ID } from "@/data/hero";
 import { personaById } from "@/data/people";
 import type { Message, Thread } from "@/data/types";
@@ -28,6 +33,7 @@ export default function ClientQuestions() {
   const isEmily = persona.id === "emily";
   const progress = useClientProgress();
   const extras = useExtraMessages();
+  const sharedThreads = useExtraThreads();
   const { notify } = useToast();
   const { data: apiThreads, loading } = useQuery(
     () => api.getThreads(HERO_RETURN_ID, "client"),
@@ -62,7 +68,14 @@ export default function ClientQuestions() {
     );
   }
 
-  const threads = apiThreads ?? [];
+  // Questions the preparer raised during the demo arrive here too — but
+  // only the client-visible ones, same rule as the API applies.
+  const threads = [
+    ...sharedThreads.filter(
+      (t) => t.returnId === HERO_RETURN_ID && t.visibility === "client",
+    ),
+    ...(apiThreads ?? []),
+  ];
 
   const mergedMessages = (thread: Thread): readonly Message[] => {
     const known = new Set(thread.messages.map((m) => m.id));
@@ -203,6 +216,34 @@ export default function ClientQuestions() {
                     <Button size="sm" variant="primary">Upload it now</Button>
                   </Link>
                 </div>
+              )}
+
+              {/* Any other question still gets a way to answer — no thread
+                  is ever a dead end. */}
+              {!replied && !isReceiptQuestion && !isDocRequest && (
+                <form
+                  className="mt-3 flex items-end gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (draft.trim()) answer(thread, draft.trim());
+                  }}
+                >
+                  <textarea
+                    value={draftThreadId === thread.id ? draft : ""}
+                    onFocus={() => setDraftThreadId(thread.id)}
+                    onChange={(e) => {
+                      setDraftThreadId(thread.id);
+                      setDraft(e.target.value);
+                    }}
+                    rows={2}
+                    placeholder="Type your answer…"
+                    aria-label={`Answer: ${thread.subject}`}
+                    className="w-full resize-none rounded-lg border border-line bg-white px-2.5 py-2 text-[13px] outline-none focus:border-spruce"
+                  />
+                  <Button size="sm" variant="primary" type="submit" aria-label="Send answer">
+                    <Send className="h-3.5 w-3.5" />
+                  </Button>
+                </form>
               )}
 
               {docUploaded && !replied && (

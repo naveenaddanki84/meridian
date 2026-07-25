@@ -9,7 +9,7 @@ import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { deadlineLabel } from "@/lib/format";
 import { rememberSpot } from "@/lib/workspace-chip";
-import { addSharedMessage, useExtraMessages } from "@/lib/thread-store";
+import { addSharedMessage, addSharedThread, useExtraMessages, useExtraThreads } from "@/lib/thread-store";
 import { useToast } from "@/components/ui/toast";
 import { stageById } from "@/data/statuses";
 import type { ReturnField, Thread, ThreadAnchor } from "@/data/types";
@@ -60,8 +60,12 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   // Replies written in the client's view arrive here through the shared
   // store — the collaboration loop works across roles (Challenge 02).
   const extraMessages = useExtraMessages();
+  const sharedThreads = useExtraThreads();
   const threads = useMemo(() => {
-    const merged = (apiThreads ?? []).map((t) => {
+    const merged = [
+      ...sharedThreads.filter((t) => t.returnId === returnId),
+      ...(apiThreads ?? []),
+    ].map((t) => {
       const base = threadOverrides[t.id] ?? t;
       const extras = extraMessages[t.id] ?? [];
       const known = new Set(base.messages.map((m) => m.id));
@@ -77,7 +81,7 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
       };
     });
     return [...newThreads, ...merged];
-  }, [apiThreads, threadOverrides, newThreads, extraMessages]);
+  }, [apiThreads, threadOverrides, newThreads, extraMessages, sharedThreads, returnId]);
 
   // Selection + deep links (?field= / ?doc= / ?thread=, Challenge 04)
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(
@@ -111,6 +115,16 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   }, []);
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) ?? null;
+
+  // Arriving at the workspace at all — by deep link, search result, or a
+  // click — is what makes it worth returning to (Challenge 04).
+  useEffect(() => {
+    if (!ret) return;
+    rememberSpot({
+      label: `${ret.clientName}'s return`,
+      href: `${window.location.pathname}${window.location.search}`,
+    });
+  }, [ret]);
 
   // Deep links (?field=…) should open the source document too, like a click would.
   useEffect(() => {
@@ -264,7 +278,9 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
         { id: `m-${Date.now()}`, authorId: persona.id, body, sentAt: new Date().toISOString() },
       ],
     };
-    setNewThreads((prev) => [thread, ...prev]);
+    // Client-visible questions must actually reach the client's view.
+    if (visibility === "client") addSharedThread(thread);
+    else setNewThreads((prev) => [thread, ...prev]);
     setNewAnchor(null);
     notify(
       visibility === "client"

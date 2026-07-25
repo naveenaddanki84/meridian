@@ -42,7 +42,7 @@ export default function ReturnsList() {
       <header className="mb-5">
         <h1 className="font-display text-3xl tracking-tight text-ink">Returns</h1>
         <p className="mt-1 text-[13px] text-ink-soft">
-          {returns?.length ?? "…"} returns this season, sorted by deadline.
+          {returns ? returns.length.toLocaleString("en-US") : "…"} returns this season, sorted by deadline.
         </p>
       </header>
 
@@ -116,7 +116,7 @@ export default function ReturnsList() {
 
       {filteredCount > visible.length && (
         <p className="mt-3 rounded-xl border border-dashed border-line-strong bg-card/60 px-4 py-3 text-center text-[12px] text-ink-soft">
-          Showing the {visible.length} most urgent of {filteredCount} — pick a
+          Showing the {visible.length} most urgent of {filteredCount.toLocaleString("en-US")} — pick a
           stage above or use ⌘K to find a specific client.
         </p>
       )}

@@ -72,13 +72,14 @@ export default function StaffDocuments() {
       <header className="mb-5">
         <h1 className="font-display text-3xl tracking-tight text-ink">Documents</h1>
         <p className="mt-1 text-[13px] text-ink-soft">
-          {documents?.length ?? "…"} documents across {groups.length || "…"} clients ·{" "}
+          {documents ? documents.length.toLocaleString("en-US") : "…"} documents across{" "}
+          {groups.length ? groups.length.toLocaleString("en-US") : "…"} clients ·{" "}
           <button
             type="button"
             onClick={() => setStatus(status === "needed" ? null : "needed")}
             className="font-semibold text-attention underline-offset-2 hover:underline"
           >
-            {missingCount} still missing
+            {missingCount.toLocaleString("en-US")} still missing
           </button>
         </p>
       </header>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Message } from "@/data/types";
+import type { Message, Thread } from "@/data/types";
 
 /**
  * Shared message store (Challenge 02): replies written in one role's view
@@ -12,6 +12,7 @@ import type { Message } from "@/data/types";
 type ExtraMessages = Readonly<Record<string, readonly Message[]>>;
 
 const KEY = "meridian.thread-messages.v2";
+const THREADS_KEY = "meridian.threads.v2";
 const EVENT = "meridian-threads-change";
 
 export function readExtraMessages(): ExtraMessages {
@@ -54,6 +55,48 @@ export function useExtraMessages(): ExtraMessages {
   }, []);
 
   return extras;
+}
+
+/**
+ * Threads started during the demo (e.g. a preparer's "Ask the client")
+ * live here so the other role actually receives them.
+ */
+export function readExtraThreads(): readonly Thread[] {
+  try {
+    const raw = window.localStorage.getItem(THREADS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Thread[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addSharedThread(thread: Thread): void {
+  try {
+    window.localStorage.setItem(
+      THREADS_KEY,
+      JSON.stringify([thread, ...readExtraThreads()]),
+    );
+    window.dispatchEvent(new Event(EVENT));
+  } catch {
+    // Storage unavailable — the thread stays local to this view.
+  }
+}
+
+export function useExtraThreads(): readonly Thread[] {
+  const [threads, setThreads] = useState<readonly Thread[]>([]);
+  useEffect(() => {
+    const sync = () => setThreads(readExtraThreads());
+    sync();
+    window.addEventListener(EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  return threads;
 }
 
 /** True when the client has replied on any thread of this return. */

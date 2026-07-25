@@ -19,11 +19,22 @@ export default function ReturnsList() {
   const { data: returns, loading } = useQuery(() => api.getReturns(), []);
   const [stageFilter, setStageFilter] = useState<StageId | "all">("all");
 
+  const LIST_CAP = 60;
+
+  const filteredCount = useMemo(() => {
+    const list = returns ?? [];
+    return stageFilter === "all"
+      ? list.length
+      : list.filter((r) => r.stage === stageFilter).length;
+  }, [returns, stageFilter]);
+
   const visible = useMemo(() => {
     const list = returns ?? [];
     const filtered =
       stageFilter === "all" ? list : list.filter((r) => r.stage === stageFilter);
-    return [...filtered].sort((a, b) => daysUntil(a.deadline) - daysUntil(b.deadline));
+    return [...filtered]
+      .sort((a, b) => daysUntil(a.deadline) - daysUntil(b.deadline))
+      .slice(0, LIST_CAP);
   }, [returns, stageFilter]);
 
   return (
@@ -102,6 +113,13 @@ export default function ReturnsList() {
           );
         })}
       </ul>
+
+      {filteredCount > visible.length && (
+        <p className="mt-3 rounded-xl border border-dashed border-line-strong bg-card/60 px-4 py-3 text-center text-[12px] text-ink-soft">
+          Showing the {visible.length} most urgent of {filteredCount} — pick a
+          stage above or use ⌘K to find a specific client.
+        </p>
+      )}
 
       {!loading && visible.length === 0 && (
         <p className="rounded-xl border border-dashed border-line-strong bg-card/60 px-4 py-8 text-center text-[13px] text-ink-soft">

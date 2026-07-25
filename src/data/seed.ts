@@ -46,10 +46,11 @@ function isoDay(monthIndex: number, day: number, year = 2026): string {
 }
 
 /**
- * Volume matters (Ch 07/09): enough returns that a preparer's queue and
- * the documents list get tested at realistic scale, not demo scale.
+ * Volume matters (Ch 07/09): the brief asks for a dashboard that stays
+ * usable when one person owns HUNDREDS of returns — so Marcus owns ~200
+ * of ~500, and the documents list runs to several thousand.
  */
-const RETURN_COUNT = 120;
+const RETURN_COUNT = 500;
 
 function buildReturns(): readonly TaxReturn[] {
   const generated = Array.from({ length: RETURN_COUNT }, (_, i): TaxReturn => {

@@ -1,220 +1,195 @@
 # Meridian — every number has a receipt
 
-A working prototype of an AI-powered tax platform for clients and the CPA firms
-who serve them, built for the **AI Engineer case study** ("Designing an
-AI-Powered Tax Platform From Scratch"). One cohesive product, two lenses: a calm,
-plain-English experience for clients, and a deep, traceable workspace for
-preparers. All ten challenges are covered.
+Meridian is a working prototype of an AI tax platform for clients and the CPA
+firms who serve them. I built it for the AI Engineer case study, "Designing an
+AI-Powered Tax Platform From Scratch." It covers all ten challenges in the
+brief.
 
 **Live demo:** <https://meridian-gilt-ten.vercel.app> · **Video walkthrough:**
 <https://youtu.be/MlAtiH5tt1w>
 
 ![Review workspace — tracing a wage figure back to Box 1 of the W-2](docs/screenshots/review-trace-w2.jpeg)
 
-## The 60-second tour
+That screenshot is the whole idea. A preparer clicked the wage figure on the
+return, and a line drew from that field to Box 1 of the client's W-2, on the
+actual PDF. The card underneath says what the AI read, which document it came
+from, and how sure it was.
 
-1. **Pick a hat** on the landing page — six people, one product.
-2. **As Mike (preparer):** the *Today* queue says what to work on and *why* →
-   open Emily Carter → click **Wages and salary** → a thread draws from the
-   field to Box 1 of her W-2, with a receipt-style card: what the AI read, how
-   sure it is, and what to do about it → open **Charitable contributions**
-   (amber, 62% confident, handwritten receipt) → *Fix it* → the correction is
-   recorded, the AI's original stays on file, and there's an Undo.
-3. **As Emily (client):** "2 things need you · about 4 min" → upload the missing
-   K-1 and watch it get read → answer Mike's question about the donation with
-   one tap. She never sees confidence scores, substages, or internal notes.
-4. **As Dave (day one):** an account created this morning, nothing done yet.
-   Answer six plain-language questions, one at a time, watch the home screen
-   change as onboarding completes, then open **Your documents**: eight asks in
-   his words, each with where to find it, unlocked only once the questions are
-   answered.
-5. **As Katie (seasonal):** open a return that isn't hers and the door is
-   locked, with a working request-access flow to the firm admin — and her
-   documents list and search are scoped the same way.
+A CPA can't trust a number they can't check. So provenance isn't a tooltip
+here, it's the main interaction, and everything else is built around it.
 
-## Challenges covered → where to look
+## Try it in five minutes
 
-| # | Challenge | Where it lives | The one-line decision |
-|---|-----------|----------------|----------------------|
-| 01 | Source traceability | Review workspace | Click any value → a drawn thread + a highlight landing on the exact box of the **real PDF** (pdf.js, with the provenance overlay in the document's own coordinate space); calculations chain (click an input to keep tracing), and the receipt says when there's *no* AI involved |
-| 02 | Client & CPA collaboration | Conversations panel · client "Questions for you" | Threads pin to fields/documents, are marked *Firm only* vs *Client can see*, and outstanding requests are tracked — grouped by whose move it is, with age |
-| 03 | Where to start | Client home | One card: what needs you, how long it takes, in minutes — and the interface visibly changes as onboarding completes (finish everything and the checklist gives way to status) |
-| 04 | Getting lost | Everywhere | URL-deep-linkable state, breadcrumbs, thread→field jumps, and a "Back to Emily's return" chip that survives any detour |
-| 05 | Role-aware experiences | Role picker · persona menu · access control | Six personas, three genuinely different staff surfaces: preparers get a ranked queue, the reviewer a risk-first sign-off queue, the admin capacity and deadline operations. Seasonal staff are scoped to assigned returns across the workspace, the documents list, and search. A client hitting a firm URL gets a plain explanation, not a 404; Mike wears his client hat for his own return and the firm tools genuinely disappear |
-| 06 | Status & progress | Client journey card · staff stage badges | One state machine, two renderings: five plain-English steps for clients, substages for staff |
-| 07 | Actionable dashboard | Staff *Today* | Real ranking logic (deadlines, unread replies, AI flags, blocked days) over 503 returns (Mike owns 198 of them, 184 still open) — every card shows its reasons and one next action, and firm scope adds a workload-by-preparer strip for managers |
-| 08 | Clickable vs. editable | The affordance system (Legend, top right) | Six states — AI·unverified / Check this / Needs approval / Verified / Edited / Locked — same marks on every screen; pencils appear only where editing is allowed; locks explain themselves |
-| 09 | Complexity made navigable | Documents (4,028 seeded) · ⌘K search | Fold by client, cap what renders, cut with filters, narrow by typing; summary lists one click above full detail |
-| 10 | Trustworthy AI | AI review notes · provenance cards · client copy | Recommendations and warnings with the why, evidence chips that highlight the exact box, and uncertainty in words; corrections are validated and keep the AI's original on record; clients get plain words, never percentages |
+The landing page asks you to pick a person. Six are wired up: two clients, two
+preparers, a reviewer, and a firm admin.
 
-## What's real vs. simulated
+**Start as Mike, a preparer.** His Today queue is ranked, and every card says
+why it's there. Open Emily Carter, click **Wages and salary**, and watch the
+trace draw to her W-2. Then open **Charitable contributions**. It's amber and
+62% confident, because the donation receipt is handwritten and the AI read a
+scrawled 3 as an 8. Hit **Fix it**, type 300, and the correction lands with an
+Undo. The AI's original stays on the record.
 
-**Real (working code):**
-- Every interaction above: tracing, correction/verify/approve flows, threads and
-  visibility rules, prioritization scoring, search, filters, deep links, role
-  switching, the upload state machine
-- **Real PDF rendering.** The source documents are actual PDFs in
-  `public/documents/`, painted by pdf.js, with the provenance highlight as an
-  overlay positioned in the document's coordinate space — the same architecture
-  production uses, where the PDF is a stored artifact and extraction returns box
-  coordinates. The artwork is generated from the app's own `/print/[docId]`
-  route (`pnpm make-pdfs`), so the printed page and the overlay are laid out
-  from one set of coordinates and cannot drift apart
-- The dataset: 503 returns and 4,028 documents generated deterministically
-  (seeded PRNG) so edge cases are guaranteed present — a 62%-confidence
-  extraction, a client-reported value awaiting approval, locked fields, a filed
-  and locked return, returns blocked on clients for days, overdue deadlines,
-  empty states
-- Onboarding progress is shared across pages: uploading the K-1 or answering a
-  question updates the home checklist, the nav badge, and "what's next" — all
-  three read the same counter, so they can't disagree
-- The message loop crosses roles: answer as Emily and her reply appears in
-  Mike's conversation panel with ownership flipped to "Firm's move", and his
-  dashboard flags "Client replied — unread"; a question he raises shows up in
-  her home checklist, her nav badge, and her questions page (localStorage
-  stands in for the realtime backend)
-- Two client states, deliberately: Emily is mid-season (so the review workspace
-  has something to trace), Dave is on day one (so first-run can be shown from
-  zero) — his six-question onboarding and his eight-document request list are
-  real, and both drive his home screen, nav, and status
-- Row-level permissions: seasonal staff are scoped to assigned returns; the
-  check runs before any return data renders, the documents list and ⌘K search
-  are filtered in the API layer the same way, and the request-access flow names
-  the admin who owns the decision
-- Input validation where a human types into the return: corrections must be a
-  number, are normalised to currency, and refuse empty with the reason inline
-- A typed mock-API layer (`src/lib/api.ts`) with simulated latency — screens
-  render real loading skeletons and a shared error surface if a fetch fails
+**Switch to Emily.** Her home says "2 things need you, about 4 min." She
+answers Mike's question with one tap and uploads the missing K-1. She never
+sees a confidence score, a substage, or an internal note.
 
-**Simulated (by design — the brief asks for it):**
-- OCR/document parsing: the PDFs are fabricated and their box coordinates are
-  hand-authored, so "the AI read Box 1" is fabricated provenance data. The
-  *rendering and overlay path* is real; the extraction that would produce those
-  coordinates is not
-- AI confidence scores and notes: hand-authored to exercise the trust UI
-- Auth: the persona switcher stands in for login; permissions are enforced in
-  the API layer (clients never receive internal threads), not by real auth
-- Persistence: field corrections live in React state (refresh resets them);
-  messages and onboarding progress persist in localStorage — the "Reset demo"
-  button in the landing page's role section starts everything over
-- The clock: the app lives on a fixed "today" (March 2, 2026) so deadlines read
-  realistically
+**Switch to Dave.** His account was created this morning, so the product has no
+data in it at all. Six questions, one at a time, then eight document requests
+written in his language with a note on where to find each one. The documents
+stay locked until the questions are answered, because you can't ask for the
+right eight until you know which eight.
 
-## Key design decisions (and why)
+**Switch to Katie, seasonal staff.** Open a return that isn't hers. The door is
+locked, it names who it belongs to, and she can request access from the admin.
+Her document list and her search results are scoped the same way.
 
-- **"Every number has a receipt."** Trust in AI output is the product's core
-  problem, so provenance is the hero interaction, not a tooltip. The trace
-  thread makes the connection literal.
-- **Clients never see confidence scores.** A percentage creates doubt without
-  giving a client any action. They see "we read this from your W-2 — does this
-  look right?"; the 62% lives on the preparer's side, where someone can act on
-  it.
-- **One state machine, two vocabularies.** Status confusion comes from showing
-  everyone the same words. The data model stores one state; the client and
-  staff views render it differently on purpose.
-- **The dashboard ranks, and says why.** Reason chips ("Deadline in 4 days",
-  "Client replied — unread") are the anti-spreadsheet: a queue you can trust
-  without rebuilding it yourself.
-- **Affordance states are data, not styling.** `ai_generated | needs_review |
-  needs_approval | verified | edited | locked` live on the field model; the UI
-  renders them identically everywhere, and the Legend documents the language
-  in-product.
-- **Corrections don't argue.** Fixing an AI value takes one input; the original
-  extraction stays visible on the record. The AI never defends itself — but the
-  input is still validated, because a tax figure that isn't a number is a bug,
-  not a preference.
-- **The shell wins over the role.** Inside `/client`, a preparer wearing their
-  client hat loses the firm rail *and* firm-wide search. A banner promising
-  "firm tools are hidden here" has to be true, not reassuring.
-- **Counts come from one source.** The unverified-value count on the dashboard
-  is derived from the same predicate the workspace queue uses; open client
-  questions are counted once and read by three surfaces. Two screens
-  disagreeing about the same number is the fastest way to lose a reviewer's
-  trust.
-- **Nothing changes silently.** Verifying, approving, correcting, or sending a
-  message raises a confirmation in a polite `aria-live` region — with Undo on
-  anything that altered a number, so review never feels risky.
+## Where each challenge lives
 
-## How I verified it
+| # | Challenge | Where to look | The decision |
+|---|-----------|---------------|--------------|
+| 01 | Source traceability | Review workspace | Click a value, get a drawn line to the exact box on a real PDF. Calculated values show their formula with clickable inputs, so tracing chains until you hit paper. Receipts say when no AI was involved. |
+| 02 | Client & CPA collaboration | Conversations panel, client "Questions for you" | Threads pin to a field or document. Each is marked *Firm only* or *Client can see*, grouped by whose move it is, with the age of the last message. |
+| 03 | Where to start | Client home | One card: what needs you and how long it takes. The screen visibly changes as onboarding completes. Finish everything and the checklist gives way to status. |
+| 04 | Getting lost | Everywhere | Every selection is a URL. Breadcrumbs, thread-to-field jumps, and a "back to where I was" chip that survives any detour. |
+| 05 | Role-aware experiences | Role picker, persona menu, access control | Six people, three genuinely different staff surfaces. Seasonal staff are scoped across the workspace, documents, and search. A client who lands on a firm URL gets an explanation, not a 404. Mike wears a client hat for his own return and the firm tools disappear. |
+| 06 | Status & progress | Client journey card, staff stage badges | One state machine, two vocabularies. Five plain steps for clients, stages and substages for staff. |
+| 07 | Actionable dashboard | Staff *Today* | Real ranking over 503 returns. Mike owns 198 of them, 184 still open. Every card carries its reasons and one next action, and firm scope adds workload per preparer. |
+| 08 | Clickable vs. editable | The Legend, top right | Six states, one visual language, used identically everywhere. Pencils appear only where editing is allowed. Locks explain themselves. |
+| 09 | Complexity made navigable | Documents (4,028 seeded), ⌘K search | Fold by client, cap what renders, cut with filters, narrow by typing. |
+| 10 | Trustworthy AI | Review notes, provenance cards, client copy | Reasoning in words, evidence chips that highlight the exact box, uncertainty stated plainly. Corrections are validated and keep the AI's original. Clients never see percentages. |
 
-Behaviour is checked by scripted browser runs against the real app rather than
-by clicking around — **228 assertions across six suites**, all passing:
+## What's real and what's faked
 
-```bash
-pnpm dev --port 3111           # then, in another shell:
-node docs/demo-verify.mjs      # 57 · the core client ↔ preparer demo path
-node docs/roles-verify.mjs     # 46 · Dave, Katie, Sarah, Linda role surfaces
-node docs/roundtrip-verify.mjs # 16 · messages crossing roles in both directions
-node docs/progress-verify.mjs  # 18 · onboarding progress, resume, and skip
-node docs/fixes-verify.mjs     # 33 · permission scope, validation, PDF overlay alignment
-node docs/script-verify.mjs    # 58 · the walkthrough's exact click path, in order
-node docs/a11y-audit.mjs       # contrast/labels/scroll on 9 routes × 2 viewports
-```
+The brief says to keep the backend quick and dirty, so I did. Here's the honest
+split.
 
-They drive local Chrome against `localhost:3111`. The last one is worth calling
-out: it walks the recorded demo end to end, so the walkthrough script can't
-drift away from the product — writing it is how I found that a preparer wearing
-their client hat could still search the whole firm.
+**Real, working code.** Every interaction above: the tracing, the verify and
+correct and approve flows, thread visibility rules, the ranking logic, search,
+filters, deep links, role switching, and the upload state machine.
+
+The PDF rendering is real. The source documents are actual PDFs in
+`public/documents/`, painted by pdf.js, with the provenance highlight as an
+overlay positioned in the document's own coordinate space. That's the shape
+production takes, where the PDF is a stored artifact and extraction hands back
+box coordinates. The artwork is generated from the app's own `/print/[docId]`
+route via `pnpm make-pdfs`, so the printed page and the overlay are laid out
+from one set of numbers and can't drift apart.
+
+The dataset is 503 returns and 4,028 documents from a seeded PRNG, so the edge
+cases are always present: a 62% extraction, a client-reported value awaiting
+approval, locked fields, a filed return, returns blocked on clients for days,
+overdue deadlines, empty states.
+
+The message loop genuinely crosses roles. Answer as Emily and her reply shows
+up in Mike's panel with ownership flipped to "Firm's move" and his dashboard
+flagging "Client replied." Send a question as Mike and it appears in her
+checklist, her nav badge, and her questions page. localStorage stands in for
+the realtime backend.
+
+Permissions run before data renders. Seasonal staff are scoped to assigned
+returns, and the documents list and ⌘K search are filtered in the API layer the
+same way. Corrections are validated, since a tax figure that isn't a number is
+a bug rather than a preference.
+
+**Simulated, by design.** OCR and document parsing: the PDFs are fabricated and
+their box coordinates are hand-authored, so "the AI read Box 1" is invented
+provenance. The rendering and overlay path is real; the extraction that would
+produce those coordinates is not. Confidence scores and AI notes are
+hand-authored to exercise the trust UI. The persona switcher stands in for
+auth. Field corrections live in React state, so a refresh resets them, while
+messages and onboarding progress persist in localStorage. The app runs on a
+fixed today of March 2, 2026, so deadlines read realistically.
+
+## Decisions I'd defend
+
+**Clients never see confidence scores.** A percentage creates doubt without
+giving a client anything to do about it. They get "we read this from your W-2,
+does this look right?" The 62% lives on the preparer's side, where someone can
+act on it.
+
+**One state machine, two vocabularies.** Status confusion comes from showing
+everyone the same words. The model stores one state. "Internal review" and "in
+preparation" both render to a client as "we're working on it," because the
+difference matters to the firm and not to her.
+
+**The dashboard ranks, and says why.** Reason chips like "Deadline in 4 days"
+and "Client replied, unread" are the anti-spreadsheet. A ranked list you can't
+interrogate is just somebody else's opinion.
+
+**Affordance states are data, not styling.** `ai_generated`, `needs_review`,
+`needs_approval`, `verified`, `edited`, and `locked` live on the field model.
+The UI renders them the same way everywhere, and the Legend documents the
+language inside the product.
+
+**Corrections don't argue.** Fixing an AI value takes one input, and the
+original extraction stays visible. The AI never defends itself and never
+quietly disappears its own mistake. That record is what makes a firm willing to
+let it go first.
+
+**The shell wins over the role.** Inside `/client`, a preparer wearing their
+client hat loses the firm rail and firm-wide search. A banner that says "firm
+tools are hidden here" has to be true, not reassuring.
+
+**Counts come from one source.** The unverified-value count on the dashboard
+uses the same predicate as the workspace queue. Open client questions are
+counted once and read by three surfaces. Two screens disagreeing about the same
+number is the fastest way to lose a reviewer's trust.
+
+**Nothing changes silently.** Verifying, approving, correcting, or sending a
+message raises a confirmation in a polite `aria-live` region, with Undo on
+anything that altered a number.
 
 ## Accessibility
 
-Audited programmatically, not by eye: every text/background pair on all 9
-routes was measured at both 1440px and 390px.
+Audited with a script, not by eye. Every text and background pair on all nine
+routes, measured at 1440px and 390px.
 
-- **WCAG AA contrast** everywhere — the audit initially failed (the muted text
-  token was 2.90:1), so the palette was corrected to pass at 4.5:1+
-- **No text below 12px**, tabular figures for all money
-- **Every control has an accessible name**; icon-only buttons carry `aria-label`
-- **Keyboard**: visible focus rings (never removed), logical tab order, Escape
-  closes overlays, ⌘K opens search
-- **No horizontal scroll** at any tested viewport; 44px touch targets on coarse
-  pointers
-- **`prefers-reduced-motion`** honored; all transitions 150–300ms
+The audit failed the first time. The muted text token was 2.90:1, so I fixed
+the palette to pass at 4.5:1. Beyond contrast: no text under 12px, tabular
+figures for money, an accessible name on every control, visible focus rings,
+Escape closes overlays, no horizontal scroll at any tested width, 44px touch
+targets on coarse pointers, and `prefers-reduced-motion` honored.
 
 ## Where things live
 
 ```
 src/data/        types.ts · statuses.ts (the state machine) · people.ts
-                 hero.ts (Emily's fully-traced return) · seed.ts (the 503/4,028 generator)
-src/lib/         api.ts (the only file production replaces) · priority.ts (ranking)
+                 hero.ts (Emily's fully-traced return) · seed.ts (503/4,028 generator)
+src/lib/         api.ts (the file production replaces) · priority.ts (ranking)
                  access.ts · field-state.ts · money.ts · client-questions.ts
-                 pdf.ts (lazy pdf.js) · doc-geometry.ts (the shared box coordinates)
-src/components/  review/ (the hero workspace + PDF viewer) · client/ · dashboard/
+                 pdf.ts (lazy pdf.js) · doc-geometry.ts (shared box coordinates)
+src/components/  review/ (workspace + PDF viewer) · client/ · dashboard/
                  shell/ · ui/
-src/app/         client/ and staff/ shells, the landing page, the role picker
-                 print/[docId] — document artwork, printed to PDF by tooling
+src/app/         client/ and staff/ shells, landing page, role picker
+                 print/[docId] (document artwork, printed to PDF by tooling)
 public/documents/ the generated source PDFs the workspace renders
 docs/            verification suites · make-pdfs.mjs · record-demo.mjs · screenshots
 ```
 
-## Run locally
+## Running it
 
 ```bash
 pnpm install
 pnpm build && pnpm start   # or: pnpm dev
 ```
 
-Node 20+. No environment variables, no database — everything is seeded. The
-pdf.js worker is copied into `public/` automatically before dev and build.
+Node 20 or newer. No environment variables and no database, since everything is
+seeded. The pdf.js worker is copied into `public/` as part of dev and build.
 
-The source PDFs are committed, so nothing needs regenerating to run the app. If
-you change a document's box coordinates, re-print them with the dev server up:
-
-```bash
-pnpm make-pdfs   # drives /print/[docId] in headless Chrome → public/documents/
-```
-
-## Deploy
-
-Push to GitHub and import into Vercel (zero config), or:
+The source PDFs are committed, so nothing needs regenerating. If you change a
+document's box coordinates, reprint them with the dev server up:
 
 ```bash
-npx vercel --prod
+pnpm make-pdfs   # drives /print/[docId] in headless Chrome
 ```
+
+To deploy, import the repo into Vercel with zero config, or run
+`npx vercel --prod`.
 
 ## Path to production
 
-The mock layer is shaped like the real thing so the swap is mechanical:
+The mock layer is shaped like the real thing, so the swap is mechanical.
 
 ```
 Next.js (unchanged UI)
@@ -225,24 +200,23 @@ FastAPI on Cloud Run ── Pydantic models mirroring src/data/types.ts
    │     └── RLS policies  · internal-vs-client visibility enforced in the DB
    ├── Supabase Storage / GCS · original documents
    └── Extraction workers (Cloud Run jobs) · OCR + LLM extraction writing
-         {value, source box, confidence} — the exact provenance shape the UI
-         already renders
+         {value, source box, confidence} — the shape the UI already renders
 ```
 
-Auth becomes Supabase Auth (client magic links, firm SSO); the persona switcher
-disappears; row-level security replaces the API-layer filtering — the
-`assignedTo` scoping in `api.ts` is already written as the policy it would
-become. The prioritization scorer moves server-side unchanged.
+Auth becomes Supabase Auth with magic links for clients and SSO for the firm,
+and the persona switcher disappears. Row-level security replaces the API-layer
+filtering; the `assignedTo` scoping in `api.ts` is already written as the policy
+it would become. The prioritization scorer moves server-side unchanged.
 
-## future
+## What I'd do next
 
-Notifications and nudges, e-sign for client approval, a proper audit-log page
-built on the provenance data, text-layer selection and search inside the PDF
-viewer, and the second client (Dave) traceable end-to-end the way Emily
-already is.
+Notifications and nudges. E-sign for client approval. An audit-log page built on
+the provenance data that's already there. Text selection and search inside the
+PDF viewer. And Dave traced end to end the way Emily is, so first-run and deep
+review are the same story rather than two.
 
 ---
 
-*All names, numbers, firms, and AI output are fabricated. Built with Next.js,
-Tailwind, and TypeScript; typography is Fraunces, Public Sans, and IBM Plex
+*Every name, number, firm, and piece of AI output here is fabricated. Built with
+Next.js, Tailwind, and TypeScript. Type is Fraunces, Public Sans, and IBM Plex
 Mono.*

@@ -7,7 +7,7 @@ plain-English experience for clients, and a deep, traceable workspace for
 preparers. All ten challenges are covered.
 
 **Live demo:** <https://meridian-gilt-ten.vercel.app> · **Video walkthrough:**
-`TODO — paste recording link before submitting`
+<https://youtu.be/ekUP5Rzt4wY>
 
 ![Review workspace — tracing a wage figure back to Box 1 of the W-2](docs/screenshots/review-trace-w2.jpeg)
 
@@ -234,7 +234,7 @@ disappears; row-level security replaces the API-layer filtering — the
 `assignedTo` scoping in `api.ts` is already written as the policy it would
 become. The prioritization scorer moves server-side unchanged.
 
-## With another week
+## future
 
 Notifications and nudges, e-sign for client approval, a proper audit-log page
 built on the provenance data, text-layer selection and search inside the PDF

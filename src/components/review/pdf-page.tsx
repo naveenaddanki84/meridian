@@ -13,6 +13,19 @@ import { FIELD_AREA_STYLE, boxPosition } from "@/lib/doc-geometry";
  * point is to highlight *the* box the number came from, not to decorate the
  * page with every box we happen to know about.
  */
+
+/**
+ * Painted once, at a fixed width, then scaled by CSS.
+ *
+ * The tempting version re-renders on resize to match the pane exactly, but
+ * two `page.render()` calls overlapping on one canvas compound the PDF's
+ * bottom-left-origin flip and the page comes out upside down — which is
+ * exactly what shipped the first time, because the race only lost on a
+ * slower connection. One render, no observers, no race. 1200px covers the
+ * pane at 2× on any realistic viewport.
+ */
+const RENDER_WIDTH = 1200;
+
 export function PdfPage({
   pdf,
   pageNumber,
@@ -29,64 +42,52 @@ export function PdfPage({
   registerBox: (id: string, el: HTMLElement | null) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const wrapRef = useRef<HTMLDivElement | null>(null);
   const [ratio, setRatio] = useState(11 / 8.5);
 
   useEffect(() => {
     let cancelled = false;
-    let task: { cancel: () => void } | null = null;
+    let task: { cancel: () => void; promise: Promise<void> } | null = null;
 
-    const render = async () => {
-      const canvas = canvasRef.current;
-      const wrap = wrapRef.current;
-      if (!canvas || !wrap) return;
-
+    const paint = async () => {
       const page = await pdf.getPage(pageNumber);
-      if (cancelled) return;
+      const canvas = canvasRef.current;
+      if (cancelled || !canvas) return;
 
       const base = page.getViewport({ scale: 1 });
-      if (!cancelled) setRatio(base.height / base.width);
+      setRatio(base.height / base.width);
 
-      // Render at the element's own width, times the device pixel ratio, so
-      // form rules stay crisp on retina instead of resampling a fixed bitmap.
-      const width = wrap.clientWidth || 640;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const viewport = page.getViewport({ scale: (width / base.width) * dpr });
-
+      const viewport = page.getViewport({ scale: RENDER_WIDTH / base.width });
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
-      canvas.style.width = "100%";
-      canvas.style.height = "auto";
 
       const context = canvas.getContext("2d");
       if (!context) return;
+      // Assigning width already clears the canvas; being explicit means a
+      // stale transform can never survive into the next paint.
+      context.setTransform(1, 0, 0, 1, 0, 0);
 
       task = page.render({ canvas, canvasContext: context, viewport });
       try {
-        await (task as unknown as { promise: Promise<void> }).promise;
+        await task.promise;
       } catch {
-        // Cancelled by a resize or an unmount — nothing to report.
+        // Cancelled by an unmount — nothing to report.
       }
     };
 
-    void render();
-    const observer = new ResizeObserver(() => void render());
-    if (wrapRef.current) observer.observe(wrapRef.current);
+    void paint();
 
     return () => {
       cancelled = true;
       task?.cancel();
-      observer.disconnect();
     };
   }, [pdf, pageNumber]);
 
   return (
     <div
-      ref={wrapRef}
       className="relative w-full overflow-hidden rounded-lg border border-line-strong bg-white shadow-lift"
       style={{ aspectRatio: `1 / ${ratio}` }}
     >
-      <canvas ref={canvasRef} className="block w-full" aria-hidden="true" />
+      <canvas ref={canvasRef} className="block h-full w-full" aria-hidden="true" />
 
       {/* Provenance overlay — same coordinate system the page was printed in */}
       <div style={FIELD_AREA_STYLE} className="pointer-events-none">

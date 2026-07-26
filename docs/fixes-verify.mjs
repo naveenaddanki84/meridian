@@ -88,6 +88,27 @@ const pdfState = await p.evaluate(() => {
   };
 });
 t("pdf.js painted the page", pdfState.painted, JSON.stringify(pdfState));
+
+// A DOM-only check can't see a flipped canvas — and a flipped canvas is
+// exactly what a render race produces. The W-2's header band is dense black
+// type; the foot of the page is blank. If the mean brightness of those two
+// strips ever inverts, the page came out upside down.
+const orient = await p.evaluate(() => {
+  const c = document.querySelector('[data-pane="doc"] canvas');
+  if (!c) return null;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  const strip = (from, to) => {
+    const y = Math.floor(c.height * from);
+    const h = Math.max(1, Math.floor(c.height * (to - from)));
+    const d = ctx.getImageData(0, y, c.width, h).data;
+    let sum = 0;
+    for (let i = 0; i < d.length; i += 4) sum += (d[i] + d[i + 1] + d[i + 2]) / 3;
+    return sum / (d.length / 4);
+  };
+  return { header: strip(0.02, 0.12), foot: strip(0.86, 0.96) };
+});
+t("PDF is the right way up", orient && orient.header < orient.foot - 2,
+  `header=${orient?.header.toFixed(1)} foot=${orient?.foot.toFixed(1)} (header must be darker)`);
 t("all boxes registered as overlays", pdfState.boxCount === 12, `boxes=${pdfState.boxCount}`);
 t("the wage box is the highlighted one", pdfState.activeId === "w2-box1", `active=${pdfState.activeId}`);
 t("highlight ring drawn", pdfState.ring);

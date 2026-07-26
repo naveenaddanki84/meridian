@@ -6,8 +6,8 @@ AI-Powered Tax Platform From Scratch"). One cohesive product, two lenses: a calm
 plain-English experience for clients, and a deep, traceable workspace for
 preparers. All ten challenges are covered.
 
-**Live demo:** `TODO — paste Vercel URL before submitting` · **Video
-walkthrough:** `TODO — paste recording link before submitting`
+**Live demo:** <https://meridian-gilt-ten.vercel.app> · **Video walkthrough:**
+`TODO — paste recording link before submitting`
 
 ![Review workspace — tracing a wage figure back to Box 1 of the W-2](docs/screenshots/review-trace-w2.jpeg)
 

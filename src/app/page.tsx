@@ -1,153 +1,208 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowRight, Check, RotateCcw } from "lucide-react";
-import { PERSONAS } from "@/data/people";
-import { rememberPersona } from "@/lib/role";
-import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  BadgeCheck,
+  BrainCircuit,
+  FileCheck2,
+  LockKeyhole,
+  MessagesSquare,
+  ShieldCheck,
+  Sparkles,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
+import { HeroTrace } from "@/components/marketing/hero-trace";
+import { LandingHeroActions, LandingPersonaPanel } from "@/components/marketing/landing-actions";
 
-const SHELL_HOME: Record<string, string> = {
-  client: "/client",
-  preparer: "/staff",
-  reviewer: "/staff",
-  admin: "/staff",
-};
+const proofStats = [
+  { value: "500", label: "seeded returns" },
+  { value: "4k", label: "source documents" },
+  { value: "6", label: "role lenses" },
+];
 
-const ROLE_LABEL: Record<string, string> = {
-  client: "Client",
-  preparer: "Preparer",
-  reviewer: "Reviewer",
-  admin: "Firm admin",
-};
+const trustSignals = [
+  "Field-level provenance",
+  "Client-safe language",
+  "Scoped staff access",
+];
 
-const PERSONA_BLURB: Record<string, string> = {
-  emily:
-    "First tax season with the firm. Sees a calm home, plain-English status, and exactly what to do next.",
-  mike:
-    "Owns 200+ returns mid-season. Sees a prioritized queue and the deep review workspace.",
-  sarah: "Second set of eyes. Same product, review-first lens.",
-  linda: "Watches deadlines and workload across the whole firm.",
-  dave: "Business owner. Same client experience, different return.",
-  katie: "Seasonal staff. Sees only the returns assigned to her.",
-};
+const capabilityCards: {
+  title: string;
+  copy: string;
+  icon: LucideIcon;
+}[] = [
+  {
+    title: "Trace every AI value",
+    copy:
+      "Click a number and Meridian shows the return field, source document, exact box, confidence, and review history together.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Keep clients calm",
+    copy:
+      "Clients see plain-language progress and short requests instead of internal substages, risk scores, and preparer jargon.",
+    icon: MessagesSquare,
+  },
+  {
+    title: "Rank the firm queue",
+    copy:
+      "Preparers get a reasoned Today list driven by deadlines, blocked days, unread replies, and AI review flags.",
+    icon: BrainCircuit,
+  },
+];
 
-/**
- * Demo entry: pick a hat. This page replaces login for the prototype
- * (Challenge 05 — one product, many roles).
- */
-export default function RolePicker() {
-  const featured = PERSONAS.filter((p) => p.id === "emily" || p.id === "mike");
-  const others = PERSONAS.filter((p) => p.id !== "emily" && p.id !== "mike");
-  const [resetDone, setResetDone] = useState(false);
-
-  // Put the demo back to the first morning: Emily's tasks reopen, personas
-  // and "back to" chips clear. Handy for walkthroughs and re-evaluation.
-  const resetDemo = () => {
-    try {
-      window.localStorage.removeItem("meridian.persona");
-      window.localStorage.removeItem("meridian.client-progress");
-      window.localStorage.removeItem("meridian.thread-messages");
-      window.localStorage.removeItem("meridian.thread-messages.v2");
-      window.localStorage.removeItem("meridian.threads.v2");
-      window.sessionStorage.removeItem("meridian.workspace-spot");
-      setResetDone(true);
-      window.setTimeout(() => setResetDone(false), 2000);
-    } catch {
-      // Storage unavailable — nothing to reset.
-    }
-  };
-
+export default function LandingPage() {
   return (
-    <div className="mx-auto flex min-h-dvh max-w-3xl flex-col px-6 py-10">
-      <header className="flex items-baseline gap-1.5">
-        <span className="font-display text-2xl font-semibold tracking-tight">Meridian</span>
-        <span className="h-1.5 w-1.5 rounded-full bg-spruce" aria-hidden="true" />
+    <div className="min-h-dvh overflow-hidden bg-paper text-ink">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-card focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-ink focus:shadow-pop"
+      >
+        Skip to main content
+      </a>
+
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+        <Link href="/" className="flex min-h-11 items-center gap-2" aria-label="Meridian home">
+          <span className="font-display text-2xl font-semibold tracking-tight">Meridian</span>
+          <span className="h-2 w-2 rounded-full bg-spruce" aria-hidden="true" />
+        </Link>
+        <nav aria-label="Landing page" className="hidden items-center gap-2 md:flex">
+          <a
+            href="#demo"
+            className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-ink-soft transition-colors hover:bg-card hover:text-ink"
+          >
+            Role paths
+          </a>
+          <a
+            href="#proof"
+            className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-ink-soft transition-colors hover:bg-card hover:text-ink"
+          >
+            Proof
+          </a>
+          <Link
+            href="/demo"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-card px-3 text-sm font-semibold text-ink transition-colors hover:border-line-strong"
+          >
+            Case study
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </nav>
       </header>
 
-      <main className="my-auto py-12">
-        <h1 className="font-display text-4xl leading-tight tracking-tight text-ink sm:text-5xl">
-          Every number
-          <br />
-          has a receipt.
-        </h1>
-        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
-          A working prototype of an AI-powered tax platform for clients and the
-          CPA firms who serve them. Pick a person to see the product through
-          their eyes — you can switch anytime from the top-right menu.
-        </p>
+      <main id="main-content">
+        <section className="mx-auto max-w-6xl px-4 pb-10 pt-7 sm:px-6 sm:pt-12 lg:px-8">
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-line bg-card px-3 py-2 text-[12px] font-bold uppercase tracking-[0.18em] text-spruce shadow-lift">
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              AI tax platform for CPA firms
+            </div>
+            <h1 className="mt-6 font-display text-6xl leading-none tracking-tight text-ink sm:text-7xl lg:text-8xl">
+              Meridian
+            </h1>
+            <p className="mt-5 max-w-3xl font-display text-3xl leading-tight text-spruce-deep sm:text-4xl">
+              Every number has a receipt.
+            </p>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-ink-soft sm:text-lg">
+              A working prototype for AI-assisted tax preparation: client requests,
+              firm queues, document evidence, role permissions, and field-level
+              provenance in one product model.
+            </p>
+            <LandingHeroActions />
+          </div>
 
-        <div className="mt-10 grid gap-3 sm:grid-cols-2">
-          {featured.map((p) => (
-            <Link
-              key={p.id}
-              href={SHELL_HOME[p.role]}
-              onClick={() => rememberPersona(p.id)}
-              className="group rounded-2xl border border-line bg-card p-5 shadow-lift transition-all hover:-translate-y-0.5 hover:border-spruce/40 hover:shadow-pop"
-            >
-              <div className="flex items-center justify-between">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-spruce text-[13px] font-bold text-white">
-                  {p.initials}
-                </span>
-                <Badge tone="brand">{ROLE_LABEL[p.role]}</Badge>
+          <div className="mt-10 grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.6fr)]">
+            <HeroTrace />
+            <aside className="grid gap-3" aria-label="Meridian proof points">
+              {proofStats.map((item) => (
+                <div key={item.label} className="rounded-lg border border-line bg-card p-4 shadow-lift">
+                  <p className="font-display text-3xl text-ink">{item.value}</p>
+                  <p className="mt-1 text-sm font-semibold text-ink-soft">{item.label}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-spruce/30 bg-spruce-soft p-4">
+                <p className="flex items-center gap-2 text-sm font-bold text-spruce">
+                  <BadgeCheck className="h-4 w-4" aria-hidden="true" />
+                  Trust language
+                </p>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
+                  {trustSignals.map((signal) => (
+                    <li key={signal} className="flex gap-2">
+                      <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-ai" aria-hidden="true" />
+                      <span>{signal}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="mt-4 font-display text-xl text-ink">{p.name}</p>
-              <p className="mt-1.5 min-h-16 text-[13px] leading-relaxed text-ink-soft">
-                {PERSONA_BLURB[p.id]}
-              </p>
-              <span className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-spruce">
-                Enter as {p.name.split(" ")[0]}
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </Link>
-          ))}
-        </div>
+            </aside>
+          </div>
+        </section>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {others.map((p) => (
-            <Link
-              key={p.id}
-              href={SHELL_HOME[p.role]}
-              onClick={() => rememberPersona(p.id)}
-              className="group flex min-w-0 items-center gap-3 rounded-2xl border border-line bg-card/60 px-5 py-3.5 transition-colors hover:border-spruce/40 hover:bg-card"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-paper text-[12px] font-bold text-ink-soft">
-                {p.initials}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
-                <span className="block truncate text-[12px] text-ink-faint">
-                  {PERSONA_BLURB[p.id]}
-                </span>
-              </span>
-              <Badge>{ROLE_LABEL[p.role]}</Badge>
-            </Link>
-          ))}
-        </div>
+        <LandingPersonaPanel />
+
+        <section id="proof" className="border-t border-line bg-card/55">
+          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+            <div className="max-w-3xl">
+              <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-spruce">
+                Product proof
+              </p>
+              <h2 className="mt-2 font-display text-3xl leading-tight text-ink sm:text-4xl">
+                Built around the audit trail, not a black box.
+              </h2>
+            </div>
+            <div className="mt-8 grid gap-3 md:grid-cols-3">
+              {capabilityCards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <article key={card.title} className="rounded-lg border border-line bg-card p-5 shadow-lift">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-ai-soft text-ai">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-4 font-display text-xl text-ink">{card.title}</h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">{card.copy}</p>
+                  </article>
+                );
+              })}
+            </div>
+            <div className="mt-3 rounded-lg border border-line bg-paper p-5">
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="flex gap-3">
+                  <LockKeyhole className="mt-1 h-5 w-5 shrink-0 text-spruce" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-ink">Permissions first</p>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+                      Seasonal staff, reviewers, admins, clients, and preparers see the same return through scoped access.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <UsersRound className="mt-1 h-5 w-5 shrink-0 text-attention" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-ink">Collaboration pinned to work</p>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+                      Threads attach to fields and documents so ownership never drifts away from the evidence.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <FileCheck2 className="mt-1 h-5 w-5 shrink-0 text-verified" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-ink">Corrections stay on record</p>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+                      Fixes preserve the AI original, the human edit, and the source path that justified the change.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
-      <footer className="flex flex-wrap items-center justify-between gap-3 text-[12px] leading-relaxed text-ink-faint">
-        <span className="max-w-md">
-          Built for the AI Engineer case study. Every name, number, and AI output
-          is fabricated; the interactions are real. No real tax advice lives here.
-        </span>
-        <button
-          type="button"
-          onClick={resetDemo}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 py-1.5 font-semibold text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
-        >
-          {resetDone ? (
-            <>
-              <Check className="h-3.5 w-3.5 text-verified" />
-              Fresh start ready
-            </>
-          ) : (
-            <>
-              <RotateCcw className="h-3.5 w-3.5" />
-              Reset demo
-            </>
-          )}
-        </button>
+      <footer className="border-t border-line">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-[13px] leading-relaxed text-ink-faint sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <span>Built for the AI Engineer case study. All names, numbers, and AI output are fabricated.</span>
+          <span>No real tax advice lives here.</span>
+        </div>
       </footer>
     </div>
   );

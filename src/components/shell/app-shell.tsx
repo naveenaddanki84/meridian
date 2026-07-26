@@ -28,6 +28,9 @@ function WorkspaceChip() {
   }, [pathname]);
 
   if (!spot || pathname === spot.href.split("?")[0]) return null;
+  // Nobody inherits someone else's place in the app — a reviewer who just
+  // switched in never opened the return the outgoing preparer was reading.
+  if (spot.personaId !== persona.id) return null;
   // A client must never be offered a firm URL, even one left over in this
   // browser from another persona (Challenge 05).
   if (persona.role === "client" && spot.href.startsWith("/staff")) return null;

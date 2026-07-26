@@ -188,9 +188,9 @@ export default function ClientHome() {
 
       {isDave && !progress.daveQuestionnaireDone && (
         <div className="mb-4 rounded-xl border border-spruce/25 bg-spruce-wash px-4 py-2.5 text-[13px] text-ink">
-          <span className="font-semibold">Welcome to Meridian.</span> Your
-          account was created this morning — here&apos;s everything, from the
-          top.
+          <span className="font-semibold">Welcome to Meridian.</span>{" "}
+          Your account was created this morning — here&apos;s everything, from
+          the top.
         </div>
       )}
 

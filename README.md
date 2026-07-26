@@ -184,7 +184,7 @@ src/components/  review/ (the hero workspace + PDF viewer) · client/ · dashboa
 src/app/         client/ and staff/ shells, the landing page, the role picker
                  print/[docId] — document artwork, printed to PDF by tooling
 public/documents/ the generated source PDFs the workspace renders
-docs/            verification suites · make-pdfs.mjs · screenshots
+docs/            verification suites · make-pdfs.mjs · record-demo.mjs · screenshots
 ```
 
 ## Run locally

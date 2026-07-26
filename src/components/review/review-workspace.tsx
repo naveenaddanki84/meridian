@@ -125,12 +125,20 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
 
   // Arriving at the workspace at all — by deep link, search result, or a
   // click — is what makes it worth returning to (Challenge 04).
+  const spotRecordedFor = useRef<string | null>(null);
   useEffect(() => {
     // Never offer a way back into a return this person can't open.
     if (!ret || !canOpenReturn(persona, ret)) return;
+    // Record the arrival, not every re-render. Switching persona while the
+    // workspace is open re-runs this effect under the incoming user, and
+    // stamping the spot for them would hand a reviewer a "back to" chip for
+    // a return they never opened.
+    if (spotRecordedFor.current === ret.id) return;
+    spotRecordedFor.current = ret.id;
     rememberSpot({
       label: `${ret.clientName}'s return`,
       href: `${window.location.pathname}${window.location.search}`,
+      personaId: persona.id,
     });
   }, [ret, persona]);
 
@@ -161,10 +169,11 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
         rememberSpot({
           label: `${ret.clientName}'s return`,
           href: `${url.pathname}${url.search}`,
+          personaId: persona.id,
         });
       }
     },
-    [ret],
+    [ret, persona.id],
   );
 
   const showEvidence = useCallback((documentId: string, boxId: string) => {

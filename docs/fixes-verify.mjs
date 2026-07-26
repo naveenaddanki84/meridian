@@ -6,7 +6,7 @@ const b=await chromium.launch({executablePath:"/Applications/Google Chrome.app/C
 const p=await (await b.newContext({viewport:{width:1440,height:900}})).newPage();
 const errs=[]; p.on("pageerror",e=>errs.push(e.message));
 const go=async x=>{await p.goto(B+x,{waitUntil:"networkidle"});await p.waitForTimeout(700);};
-const click=async s=>{await p.locator(s).first().click();await p.waitForTimeout(600);};
+const click=async(s,ms=600)=>{await p.locator(s).first().click();await p.waitForTimeout(ms);};
 const navBadge=async()=>p.evaluate(()=>{const a=document.querySelector('aside a[href="/client/questions"]');if(!a)return"none";const sp=[...a.querySelectorAll("span")].map(s=>s.textContent.trim());return sp.find(x=>/^\d+$/.test(x))||"none";});
 
 await go("/"); await click('button:has-text("Reset demo")');
@@ -154,6 +154,27 @@ t("no bare 'rachel'/'james' ids", !/·\s(rachel|james|katie|mike)\b/.test(s), s.
 await go("/"); await click('a:has-text("Sarah Mitchell")');
 s=await txt(p);
 t("reviewer names the preparer", !/prepared by (rachel|james|mike|katie)\b/.test(s));
+
+console.log("\n━━ The back-chip belongs to a person, not a browser ━━");
+await go("/"); await click('button:has-text("Reset demo")');
+await click('a:has-text("Enter as Mike")');
+await go("/staff/returns/ret-emily?field=f-wages");
+await go("/staff/documents");
+s=await txt(p);
+t("Mike gets his own spot back", s.includes("Back to Emily Carter's return"));
+// Switching away while the workspace is open used to re-stamp the spot for
+// the incoming persona, handing them a return they never opened.
+await go("/staff/returns/ret-emily");
+await click('button[aria-expanded]:has-text("Preparer")');
+await click('button:has-text("Sarah Mitchell")', 1200);
+s=await txt(p);
+t("Sarah inherits nothing", !s.includes("Back to Emily Carter's return"), s.slice(0, 120));
+
+console.log("\n━━ Day-one copy reads as sentences ━━");
+await go("/"); await click('button:has-text("Reset demo")');
+await click('a:has-text("Dave Peterson")');
+s=await txt(p);
+t("banner has its space", s.includes("Welcome to Meridian. Your account"), s.match(/Welcome to Meridian.{0,24}/)?.[0]);
 
 console.log("\n━━ KATIE: scope covers documents and search too ━━");
 await go("/"); await click('a:has-text("Katie Brennan")');

@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, Sprout } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
+import { useRole } from "@/lib/role";
 import { relativeLabel } from "@/lib/format";
 import { HERO_RETURN_ID } from "@/data/hero";
 import type { TaxDocument } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 
 const KIND_FILTERS = ["W-2", "1099-INT", "1099-DIV", "1099-B", "K-1", "Receipt"] as const;
 
@@ -24,7 +26,14 @@ const STATUS_META = {
  * filters cut, and everything else stays folded by client until needed.
  */
 export default function StaffDocuments() {
-  const { data: documents, loading } = useQuery(() => api.getDocuments(), []);
+  const { persona } = useRole();
+  // Scoped staff get their own clients only — the row-level rule that
+  // guards the workspace has to guard the document shelf too.
+  const assignedTo = persona.accessScope === "assigned" ? persona.id : undefined;
+  const { data: documents, loading, error } = useQuery(
+    () => api.getDocuments({ assignedTo }),
+    [assignedTo],
+  );
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -82,6 +91,13 @@ export default function StaffDocuments() {
             {missingCount.toLocaleString("en-US")} still missing
           </button>
         </p>
+        {assignedTo && (
+          <p className="mt-2 flex items-center gap-1.5 rounded-lg bg-locked-soft px-3 py-2 text-[12px] text-ink-soft">
+            <Sprout className="h-3.5 w-3.5 shrink-0 text-locked" />
+            Seasonal access — these are the documents for your assigned returns
+            only. Other clients&apos; files aren&apos;t listed here.
+          </p>
+        )}
       </header>
 
       {/* Search + filters */}
@@ -137,6 +153,8 @@ export default function StaffDocuments() {
           <CardSkeleton rows={2} />
         </div>
       )}
+
+      {error && <ErrorState message={error} />}
 
       {/* Grouped by client; folded until relevant */}
       <ul className="space-y-1.5">

@@ -6,23 +6,10 @@ import { ArrowRight, CalendarClock, TriangleAlert, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { daysUntil, deadlineLabel } from "@/lib/format";
+import { staffName, staffRole } from "@/data/people";
 import type { TaxReturn } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/ui/skeleton";
-
-const STAFF_NAME: Record<string, string> = {
-  mike: "Mike Sullivan",
-  rachel: "Rachel Adams",
-  james: "James Osei",
-  katie: "Katie Brennan",
-};
-
-const STAFF_ROLE: Record<string, string> = {
-  mike: "Senior preparer",
-  rachel: "Preparer",
-  james: "Preparer",
-  katie: "Seasonal",
-};
 
 /**
  * The admin doesn't work returns — she works the firm (Challenge 07 for
@@ -114,16 +101,16 @@ export function AdminDashboard({ firstName }: { firstName: string }) {
             const heavy = stats.open > average * 1.3;
             return (
               <li key={id}>
-                <div className="flex items-center gap-3">
+                {/* Fixed columns, one per signal: the badges line up down the
+                    list instead of reflowing around each other. */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                   <span className="w-32 shrink-0">
                     <span className="block truncate text-[13px] font-semibold text-ink">
-                      {STAFF_NAME[id] ?? id}
+                      {staffName(id)}
                     </span>
-                    <span className="block text-[12px] text-ink-faint">
-                      {STAFF_ROLE[id] ?? "Staff"}
-                    </span>
+                    <span className="block text-[12px] text-ink-faint">{staffRole(id)}</span>
                   </span>
-                  <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-paper">
+                  <span className="h-2.5 min-w-24 flex-1 overflow-hidden rounded-full bg-paper">
                     <span
                       className={`block h-full rounded-full ${heavy ? "bg-attention" : "bg-spruce"}`}
                       style={{ width: `${pct}%` }}
@@ -132,9 +119,21 @@ export function AdminDashboard({ firstName }: { firstName: string }) {
                   <span className="tnum w-10 shrink-0 text-right font-mono text-[13px] text-ink">
                     {stats.open}
                   </span>
-                  <span className="flex w-32 shrink-0 justify-end gap-1">
-                    {stats.overdue > 0 && <Badge tone="danger">{stats.overdue} late</Badge>}
-                    {heavy && <Badge tone="attention">over average</Badge>}
+                  <span className="flex w-full items-center justify-end gap-1.5 sm:w-[13.5rem]">
+                    <span className="flex justify-end sm:w-16">
+                      {stats.overdue > 0 && (
+                        <Badge tone="danger" className="whitespace-nowrap">
+                          {stats.overdue} late
+                        </Badge>
+                      )}
+                    </span>
+                    <span className="flex justify-end sm:w-28">
+                      {heavy && (
+                        <Badge tone="attention" className="whitespace-nowrap">
+                          over average
+                        </Badge>
+                      )}
+                    </span>
                   </span>
                 </div>
               </li>
@@ -172,7 +171,7 @@ export function AdminDashboard({ firstName }: { firstName: string }) {
                       </span>
                     </span>
                     <span className="block text-[12px] text-ink-faint">
-                      {STAFF_NAME[ret.assigneeId] ?? ret.assigneeId}
+                      {staffName(ret.assigneeId)}
                       {ret.blockedOn === "client" && ` · waiting on client ${ret.blockedDays}d`}
                     </span>
                   </span>

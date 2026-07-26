@@ -1,3 +1,4 @@
+import { countUnverified } from "@/lib/field-state";
 import type { Insight, ReturnField, TaxDocument, TaxReturn, Thread } from "./types";
 
 /**
@@ -8,7 +9,12 @@ import type { Insight, ReturnField, TaxDocument, TaxReturn, Thread } from "./typ
 
 export const HERO_RETURN_ID = "ret-emily";
 
-export const heroReturn: TaxReturn = {
+/**
+ * Everything except `aiFlags`, which is counted from the fields below so
+ * the queue card and the workspace never disagree about how much of the
+ * AI's work is still unchecked.
+ */
+const HERO_RETURN_BASE: Omit<TaxReturn, "aiFlags"> = {
   id: HERO_RETURN_ID,
   clientName: "Emily Carter",
   clientInitials: "EC",
@@ -23,7 +29,6 @@ export const heroReturn: TaxReturn = {
   docsReceived: 4,
   docsExpected: 5,
   openQuestions: 2,
-  aiFlags: 9,
   unreadClientReply: false,
   lastActivity: "2026-03-01",
   locked: false,
@@ -55,6 +60,35 @@ export const daveReturn: TaxReturn = {
   lastActivity: "2026-03-02",
   locked: false,
 };
+
+/**
+ * The eight things an 1120-S needs from Dave. All still "needed" — day
+ * one is a list of asks, each one explained in his language rather than
+ * named after the form it feeds.
+ */
+export const daveDocuments: readonly TaxDocument[] = (
+  [
+    ["dave-doc-pl", "Profit & loss statement (2025)", "P&L", "Peterson Coffee"],
+    ["dave-doc-balance", "Balance sheet (Dec 31, 2025)", "Balance sheet", "Peterson Coffee"],
+    ["dave-doc-bank", "Business bank statements", "Bank statement", "First Harbor Bank"],
+    ["dave-doc-payroll", "Payroll summary for the year", "Payroll", "Gusto Payroll"],
+    ["dave-doc-1099", "1099-NECs you issued", "1099-NEC", "Peterson Coffee"],
+    ["dave-doc-equipment", "Equipment and fit-out receipts", "Receipt", "Peterson Coffee"],
+    ["dave-doc-lease", "Shop lease agreement", "Lease", "Cedar Point Properties"],
+    ["dave-doc-prior", "Last year's business return", "Prior return", "Self-prepared"],
+  ] as const
+).map(([id, title, kind, issuer]) => ({
+  id,
+  returnId: DAVE_RETURN_ID,
+  clientName: "Dave Peterson",
+  title,
+  kind,
+  issuer,
+  status: "needed" as const,
+  uploadedAt: null,
+  pages: 0,
+  boxes: [],
+}));
 
 export const heroDocuments: readonly TaxDocument[] = [
   {
@@ -367,6 +401,11 @@ export const heroFields: readonly ReturnField[] = [
     },
   },
 ] as const;
+
+export const heroReturn: TaxReturn = {
+  ...HERO_RETURN_BASE,
+  aiFlags: countUnverified(heroFields),
+};
 
 export const heroInsights: readonly Insight[] = [
   {

@@ -7,12 +7,14 @@ import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { hasClientReply, useExtraMessages } from "@/lib/thread-store";
+import { staffName } from "@/data/people";
 import { HERO_RETURN_ID } from "@/data/hero";
 import { rankReturns, type PriorityReason } from "@/lib/priority";
 import { deadlineLabel, daysUntil } from "@/lib/format";
 import { stageById } from "@/data/statuses";
 import { Badge, type Tone } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 import { ReviewerDashboard } from "@/components/dashboard/reviewer-dashboard";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 
@@ -30,13 +32,6 @@ const REASON_TONE: Record<PriorityReason["tone"], Tone> = {
  * (Challenge 07). Ranked by real logic — every card says why it's there
  * and what to do about it.
  */
-const PREPARER_NAME: Record<string, string> = {
-  mike: "Mike",
-  rachel: "Rachel",
-  james: "James",
-  katie: "Katie (seasonal)",
-};
-
 export default function StaffDashboard() {
   const { persona } = useRole();
   const firstName = persona.name.split(" ")[0];
@@ -51,7 +46,7 @@ export default function StaffDashboard() {
 
 function PreparerDashboard() {
   const { persona } = useRole();
-  const { data: returns, loading } = useQuery(() => api.getReturns(), []);
+  const { data: returns, loading, error } = useQuery(() => api.getReturns(), []);
   const [scope, setScope] = useState<"mine" | "firm">(
     persona.role === "preparer" ? "mine" : "firm",
   );
@@ -85,12 +80,16 @@ function PreparerDashboard() {
     );
   }, [returns, extraMessages]);
 
-  const ranked = useMemo(() => {
+  // One scoped slice feeds every count on this screen — a tile that mixes
+  // "my queue" with a firm-wide total is worse than no tile at all.
+  const scopedReturns = useMemo(() => {
     if (!liveReturns) return [];
-    const scoped =
-      scope === "mine" ? liveReturns.filter((r) => r.assigneeId === persona.id) : liveReturns;
-    return rankReturns(scoped);
+    return scope === "mine"
+      ? liveReturns.filter((r) => r.assigneeId === persona.id)
+      : liveReturns;
   }, [liveReturns, scope, persona.id]);
+
+  const ranked = useMemo(() => rankReturns(scopedReturns), [scopedReturns]);
 
   const waiting = ranked.filter((r) => r.ret.blockedOn === "client");
   const inReview = ranked.filter((r) => r.ret.stage === "internal_review");
@@ -102,7 +101,7 @@ function PreparerDashboard() {
     : filter === "action" ? needsAction.slice(0, 8)
     : ranked.slice(0, 25);
 
-  const filedCount = (returns ?? []).filter((r) => r.stage === "filed").length;
+  const filedCount = scopedReturns.filter((r) => r.stage === "filed").length;
   const daysToApril = daysUntil("2026-04-15");
 
   // Manager lens (Challenge 07): workload and trouble spots by preparer.
@@ -166,7 +165,7 @@ function PreparerDashboard() {
               className="flex items-baseline gap-2 rounded-xl border border-line bg-card/70 px-3.5 py-2"
             >
               <span className="text-[13px] font-semibold text-ink">
-                {PREPARER_NAME[assignee] ?? assignee}
+                {staffName(assignee)}
               </span>
               <span className="tnum font-mono text-[12px] text-ink-soft">{stats.open} open</span>
               {stats.overdue > 0 && (
@@ -217,6 +216,8 @@ function PreparerDashboard() {
         </div>
       )}
 
+      {error && <ErrorState message={error} />}
+
       <ul className="space-y-2">
         {visible.map(({ ret, reasons, action }, index) => {
           const stage = stageById(ret.stage);
@@ -239,7 +240,9 @@ function PreparerDashboard() {
                       {ret.year} {ret.form}
                     </span>
                     {scope === "firm" && (
-                      <span className="text-[12px] text-ink-faint">· {ret.assigneeId}</span>
+                      <span className="text-[12px] text-ink-faint">
+                        · {staffName(ret.assigneeId)}
+                      </span>
                     )}
                   </span>
                   <span className="mt-1 flex flex-wrap items-center gap-1.5">

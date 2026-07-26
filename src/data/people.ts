@@ -59,3 +59,18 @@ export const personaById = (id: string): Persona => {
   if (!persona) throw new Error(`Unknown persona: ${id}`);
   return persona;
 };
+
+/**
+ * Everyone a return can be assigned to — including staff who aren't
+ * switchable personas. One directory so no screen ever falls back to
+ * printing a raw id like "rachel" at a user.
+ */
+export const STAFF_DIRECTORY: Readonly<Record<string, { name: string; role: string }>> = {
+  mike: { name: "Mike Sullivan", role: "Senior preparer" },
+  rachel: { name: "Rachel Adams", role: "Preparer" },
+  james: { name: "James Osei", role: "Preparer" },
+  katie: { name: "Katie Brennan", role: "Seasonal" },
+};
+
+export const staffName = (id: string): string => STAFF_DIRECTORY[id]?.name ?? id;
+export const staffRole = (id: string): string => STAFF_DIRECTORY[id]?.role ?? "Staff";

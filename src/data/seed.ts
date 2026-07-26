@@ -1,10 +1,10 @@
 import type { StageId, TaxDocument, TaxReturn } from "./types";
-import { daveReturn, heroDocuments, heroReturn } from "./hero";
+import { daveDocuments, daveReturn, heroDocuments, heroReturn } from "./hero";
 
 /**
  * Deterministic fake-data generator. Seeded PRNG so the server and client
  * always render the identical dataset (no hydration drift) and the demo
- * is repeatable. Volume exists to prove Challenge 09 at ~200 documents.
+ * is repeatable. Volume exists to prove Challenge 09 at ~4,000 documents.
  */
 function mulberry32(seed: number) {
   let a = seed;
@@ -138,7 +138,7 @@ function buildDocuments(returns: readonly TaxReturn[]): readonly TaxDocument[] {
       });
     });
 
-  return [...heroDocuments, ...generated];
+  return [...heroDocuments, ...daveDocuments, ...generated];
 }
 
 export const ALL_RETURNS: readonly TaxReturn[] = buildReturns();

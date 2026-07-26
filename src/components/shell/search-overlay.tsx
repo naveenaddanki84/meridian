@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, FolderOpen, MessageCircle, Search } from "lucide-react";
 import { api, type SearchResult } from "@/lib/api";
+import { useRole } from "@/lib/role";
 
 const TYPE_ICON = {
   return: FolderOpen,
@@ -33,6 +34,9 @@ export function SearchOverlay({
   const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { persona } = useRole();
+  // Search can't be a side door around row-level access.
+  const assignedTo = persona.accessScope === "assigned" ? persona.id : undefined;
 
   useEffect(() => {
     if (open) {
@@ -59,13 +63,13 @@ export function SearchOverlay({
     }
     setSearching(true);
     const t = setTimeout(() => {
-      api.search(query).then((r) => {
+      api.search(query, { assignedTo }).then((r) => {
         setResults(r);
         setSearching(false);
       });
     }, 150);
     return () => clearTimeout(t);
-  }, [query]);
+  }, [query, assignedTo]);
 
   if (!open) return null;
 

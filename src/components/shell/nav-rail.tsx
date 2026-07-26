@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 import { useRole } from "@/lib/role";
 import { useClientProgress } from "@/lib/client-progress";
+import { countOpenClientQuestions } from "@/lib/client-questions";
+import { useExtraMessages, useExtraThreads } from "@/lib/thread-store";
+import { HERO_RETURN_ID } from "@/data/hero";
 import type { RoleId } from "@/data/types";
 
 interface NavItem {
@@ -57,15 +60,24 @@ export function NavItems({ orientation }: { orientation: "vertical" | "horizonta
   const pathname = usePathname();
   const { persona } = useRole();
   const progress = useClientProgress();
+  const extras = useExtraMessages();
+  const sharedThreads = useExtraThreads();
   // The shell wins over the badge: a staff member wearing their client hat
   // inside /client sees client navigation — firm tools stay hidden there.
   const inClientShell = pathname.startsWith("/client");
   const baseItems = inClientShell ? NAV_BY_ROLE.client : NAV_BY_ROLE[persona.role];
 
-  // The badge is live: answering or uploading clears it (Challenge 03).
+  // The badge is live in both directions (Challenge 03): answering or
+  // uploading clears it, and a question the preparer sends raises it.
   const openQuestions =
     persona.id === "emily"
-      ? (progress.questionAnswered ? 0 : 1) + (progress.k1Uploaded ? 0 : 1)
+      ? countOpenClientQuestions({
+          progress,
+          extras,
+          sharedThreads,
+          returnId: HERO_RETURN_ID,
+          clientId: persona.id,
+        })
       : 0;
   const items = baseItems.map((item) =>
     item.href === "/client/questions" ? { ...item, badge: openQuestions } : item,

@@ -10,6 +10,7 @@ import { HERO_RETURN_ID } from "@/data/hero";
 import type { ChecklistItem } from "@/data/types";
 import { JourneyCard } from "@/components/client/journey-card";
 import { CardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 import { Badge } from "@/components/ui/badge";
 
 /**
@@ -45,12 +46,16 @@ const MIKE_ITEMS: readonly ChecklistItem[] = [
   },
 ];
 
+const DAVE_DOC_COUNT = 8;
+
 /** Day one for Dave: nothing done yet, and the list says so. */
 function daveChecklist(progress: {
   daveQuestionnaireDone: boolean;
   daveAnswers: Readonly<Record<string, string>>;
+  daveUploadedDocIds: readonly string[];
 }): readonly ChecklistItem[] {
   const answered = Object.keys(progress.daveAnswers).length;
+  const uploaded = progress.daveUploadedDocIds.length;
   return [
     {
       id: "d-questions",
@@ -67,11 +72,15 @@ function daveChecklist(progress: {
     {
       id: "d-docs",
       title: "Share your business documents",
-      detail: progress.daveQuestionnaireDone
-        ? "0 of 8 uploaded — we'll tell you what's missing"
-        : "Unlocks once we know about your business",
+      detail: !progress.daveQuestionnaireDone
+        ? "Unlocks once we know about your business"
+        : uploaded === 0
+          ? `0 of ${DAVE_DOC_COUNT} uploaded — we'll tell you what's missing`
+          : uploaded >= DAVE_DOC_COUNT
+            ? "All in — we've read every one"
+            : `${uploaded} of ${DAVE_DOC_COUNT} in — send the rest when you have them`,
       minutes: 10,
-      done: false,
+      done: uploaded >= DAVE_DOC_COUNT,
       href: progress.daveQuestionnaireDone ? "/client/documents" : "/client/questionnaire",
     },
   ];
@@ -85,7 +94,7 @@ export default function ClientHome() {
   const returnId =
     persona.clientReturnId ?? persona.alsoClientOfReturnId ?? HERO_RETURN_ID;
 
-  const { data: ret, loading } = useQuery(() => api.getReturn(returnId), [returnId]);
+  const { data: ret, loading, error } = useQuery(() => api.getReturn(returnId), [returnId]);
   const { data: apiChecklist } = useQuery(
     () =>
       isEmily
@@ -96,6 +105,7 @@ export default function ClientHome() {
       isDave,
       progress.daveQuestionnaireDone,
       Object.keys(progress.daveAnswers).length,
+      progress.daveUploadedDocIds.length,
     ],
   );
 
@@ -171,6 +181,12 @@ export default function ClientHome() {
 
       {loading && <CardSkeleton rows={4} />}
 
+      {error && (
+        <div className="mb-4">
+          <ErrorState message={error} />
+        </div>
+      )}
+
       {/* The one card that answers "what do I do?" */}
       {openItems.length > 0 ? (
         <section className="mb-4 rounded-2xl border border-spruce/25 bg-card p-5 shadow-lift">
@@ -240,9 +256,13 @@ export default function ClientHome() {
           preparerName={preparerName}
           nextUp={
             isDave
-              ? progress.daveQuestionnaireDone
-                ? "Share your documents and Mike starts building your return. We'll tell you if anything's missing."
-                : "Answer six quick questions so we know which forms your business needs. Then documents."
+              ? !progress.daveQuestionnaireDone
+                ? "Answer six quick questions so we know which forms your business needs. Then documents."
+                : progress.daveUploadedDocIds.length === 0
+                  ? "Share your documents and Mike starts building your return. We'll tell you if anything's missing."
+                  : progress.daveUploadedDocIds.length >= DAVE_DOC_COUNT
+                    ? "Everything's in. Mike builds your return next — we'll email you when there's something to look at."
+                    : "Keep sending documents as you find them. Mike starts as soon as the essentials are in."
               : !isEmily
                 ? "Upload the rest of your documents so Rachel can start preparing."
                 : openItems.length === 0

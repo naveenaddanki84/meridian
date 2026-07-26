@@ -6,8 +6,8 @@ AI-Powered Tax Platform From Scratch"). One cohesive product, two lenses: a calm
 plain-English experience for clients, and a deep, traceable workspace for
 preparers.
 
-**Live demo:** _add your Vercel URL here_ · **Video walkthrough:** _add your
-Loom/recording link here_
+**Live demo:** `TODO — paste Vercel URL before submitting` · **Video
+walkthrough:** `TODO — paste recording link before submitting`
 
 ![Review workspace — tracing a wage figure back to Box 1 of the W-2](docs/screenshots/review-trace-w2.jpeg)
 
@@ -24,8 +24,10 @@ Loom/recording link here_
    watch it get read → answer Mike's question about the donation with one tap.
    She never sees confidence scores, substages, or internal notes.
 4. **As Dave:** day one — an account created this morning, nothing done yet.
-   Answer six plain-language questions, one at a time, and watch the home
-   screen change as onboarding completes.
+   Answer six plain-language questions, one at a time, watch the home screen
+   change as onboarding completes, then open **Your documents**: eight asks in
+   his words, each with where to find it, unlocked only once the questions are
+   answered.
 5. **As Katie (seasonal):** open a return that isn't hers and the door is
    locked, with a working request-access flow to the firm admin.
 
@@ -65,13 +67,14 @@ Loom/recording link here_
   answers literally became return values with "from your answers" receipts
 - Two client states, deliberately: Emily is mid-season (so the review
   workspace has something to trace), Dave is on day one (so first-run can be
-  shown from zero) — his six-question onboarding is real and drives his home
-  screen, nav, and status
+  shown from zero) — his six-question onboarding and his eight-document
+  request list are real, and both drive his home screen, nav, and status
 - Row-level permissions: seasonal staff are scoped to assigned returns; the
-  check runs before any return data renders, and the request-access flow
+  check runs before any return data renders, the documents list and ⌘K search
+  are filtered in the API layer the same way, and the request-access flow
   names the admin who owns the decision
 - A typed mock-API layer (`src/lib/api.ts`) with simulated latency — screens
-  show real loading and error states
+  render real loading skeletons and a shared error surface if a fetch fails
 
 **Simulated (by design — the brief asks for it):**
 - OCR/document parsing: source documents are HTML renderings with hardcoded
@@ -163,9 +166,10 @@ prioritization scorer moves server-side unchanged.
 
 ## With another week
 
-Reviewer and admin as first-class views (they're stubs today), real PDF
-rendering with box overlays, questionnaire flow, notifications/nudges, e-sign
-for client approval, and a proper audit log page built on the provenance data.
+Real PDF rendering with box overlays instead of HTML stand-ins, notifications
+and nudges, e-sign for client approval, a proper audit-log page built on the
+provenance data, and the second client (Dave) traceable end-to-end the way
+Emily already is.
 
 ---
 

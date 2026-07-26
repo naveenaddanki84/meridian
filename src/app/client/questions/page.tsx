@@ -19,6 +19,7 @@ import type { Message, Thread } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useToast } from "@/components/ui/toast";
 
@@ -35,7 +36,7 @@ export default function ClientQuestions() {
   const extras = useExtraMessages();
   const sharedThreads = useExtraThreads();
   const { notify } = useToast();
-  const { data: apiThreads, loading } = useQuery(
+  const { data: apiThreads, loading, error } = useQuery(
     () => api.getThreads(HERO_RETURN_ID, "client"),
     [],
   );
@@ -56,6 +57,19 @@ export default function ClientQuestions() {
       });
     }
   }, []);
+
+  // Day one genuinely has no questions yet — say what this space is for
+  // instead of sending a brand-new client to somebody else's account.
+  if (persona.id === "dave") {
+    return (
+      <div className="mx-auto max-w-xl">
+        <EmptyState
+          title="No questions yet — that's a good sign"
+          detail="Once Mike starts on Peterson Coffee, anything he needs from you shows up here, attached to the part of your return it's about. We'll email you when that happens."
+        />
+      </div>
+    );
+  }
 
   if (!isEmily) {
     return (
@@ -115,6 +129,12 @@ export default function ClientQuestions() {
       </header>
 
       {loading && <CardSkeleton rows={4} />}
+
+      {error && (
+        <div className="mb-3">
+          <ErrorState message={error} />
+        </div>
+      )}
 
       <ul className="space-y-3">
         {threads.map((thread) => {

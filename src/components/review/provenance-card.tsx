@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { ReturnField, TaxDocument } from "@/data/types";
 import { confidenceLabel } from "@/lib/format";
+import { validateCorrection } from "@/lib/money";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -38,6 +39,18 @@ export function ProvenanceCard({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(field.value);
+  const [draftError, setDraftError] = useState<string | null>(null);
+
+  const submitCorrection = () => {
+    const result = validateCorrection(draft, field.value);
+    if (!result.ok || !result.value) {
+      setDraftError(result.error ?? "That value can't be used.");
+      return;
+    }
+    onCorrect(result.value);
+    setDraftError(null);
+    setEditing(false);
+  };
 
   const { source, ai } = field;
   const box = sourceDoc?.boxes.find((b) => b.id === source.boxId) ?? null;
@@ -158,26 +171,51 @@ export function ProvenanceCard({
       {/* Actions */}
       {editing ? (
         <form
-          className="mt-3 flex items-center gap-2"
+          className="mt-3"
+          noValidate
           onSubmit={(e) => {
             e.preventDefault();
-            onCorrect(draft.trim());
-            setEditing(false);
+            submitCorrection();
           }}
         >
-          <input
-            autoFocus
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            className="h-8 w-32 rounded-lg border border-line-strong bg-white px-2 font-mono text-[13px] outline-none focus:border-spruce"
-            aria-label={`Correct value for ${field.label}`}
-          />
-          <Button size="sm" variant="primary" type="submit">
-            Save correction
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
-            Cancel
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              autoFocus
+              value={draft}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                setDraftError(null);
+              }}
+              className={`h-8 w-32 rounded-lg border bg-white px-2 font-mono text-[13px] outline-none focus:border-spruce ${
+                draftError ? "border-danger" : "border-line-strong"
+              }`}
+              aria-label={`Correct value for ${field.label}`}
+              aria-invalid={draftError ? true : undefined}
+              aria-describedby={draftError ? `${field.id}-correction-error` : undefined}
+            />
+            <Button size="sm" variant="primary" type="submit">
+              Save correction
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setDraftError(null);
+                setEditing(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+          {draftError && (
+            <p
+              id={`${field.id}-correction-error`}
+              role="alert"
+              className="mt-1.5 text-[12px] font-semibold text-danger"
+            >
+              {draftError}
+            </p>
+          )}
         </form>
       ) : (
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -191,6 +229,7 @@ export function ProvenanceCard({
                 size="sm"
                 onClick={() => {
                   setDraft(field.value);
+                  setDraftError(null);
                   setEditing(true);
                 }}
               >

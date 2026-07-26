@@ -6,6 +6,7 @@ import { ArrowRight, ShieldCheck, TriangleAlert } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { daysUntil, deadlineLabel } from "@/lib/format";
+import { staffName } from "@/data/people";
 import { stageById } from "@/data/statuses";
 import type { TaxReturn } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
@@ -122,7 +123,7 @@ export function ReviewerDashboard({ firstName }: { firstName: string }) {
                       {ret.year} {ret.form}
                     </span>
                     <span className="text-[12px] text-ink-faint">
-                      · prepared by {ret.assigneeId}
+                      · prepared by {staffName(ret.assigneeId)}
                     </span>
                   </span>
                   <span className="mt-1 flex flex-wrap items-center gap-1.5">

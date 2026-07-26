@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, Check, Clock3, Lock, Send } from "lucide-react";
 import type { Persona, TaxReturn } from "@/data/types";
+import { staffName } from "@/data/people";
 import { ACCESS_APPROVER } from "@/lib/access";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
@@ -49,7 +50,7 @@ export function AccessDenied({
               {ret.clientName}&apos;s return isn&apos;t yours to open
             </h1>
             <p className="text-[12px] text-ink-faint">
-              {ret.year} {ret.form} · assigned to {ret.assigneeId === "mike" ? "Mike Sullivan" : ret.assigneeId}
+              {ret.year} {ret.form} · assigned to {staffName(ret.assigneeId)}
             </p>
           </div>
         </div>

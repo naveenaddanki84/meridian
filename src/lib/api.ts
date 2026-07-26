@@ -36,6 +36,19 @@ export interface DocumentFilters {
   query?: string;
   kind?: string;
   status?: string;
+  /**
+   * Restrict to documents belonging to returns assigned to this person.
+   * Scoped staff never receive anyone else's records — the same rule row
+   * level security would enforce in the database (Challenge 05).
+   */
+  assignedTo?: string;
+}
+
+/** Return ids a scoped user is allowed to see anything about. */
+function returnIdsAssignedTo(assigneeId: string): ReadonlySet<string> {
+  return new Set(
+    ALL_RETURNS.filter((r) => r.assigneeId === assigneeId).map((r) => r.id),
+  );
 }
 
 export const api = {
@@ -58,7 +71,9 @@ export const api = {
 
   getDocuments(filters: DocumentFilters = {}): Promise<readonly TaxDocument[]> {
     const query = filters.query?.trim().toLowerCase();
+    const allowed = filters.assignedTo ? returnIdsAssignedTo(filters.assignedTo) : null;
     const results = ALL_DOCUMENTS.filter((doc) => {
+      if (allowed && !allowed.has(doc.returnId)) return false;
       if (filters.kind && doc.kind !== filters.kind) return false;
       if (filters.status && doc.status !== filters.status) return false;
       if (query) {
@@ -113,12 +128,19 @@ export const api = {
     ]);
   },
 
-  search(query: string): Promise<readonly SearchResult[]> {
+  /** Search obeys the same scope as the lists it searches over. */
+  search(query: string, options: { assignedTo?: string } = {}): Promise<readonly SearchResult[]> {
     const q = query.trim().toLowerCase();
     if (!q) return respond([]);
 
-    const returns: SearchResult[] = ALL_RETURNS.filter((r) =>
-      `${r.clientName} ${r.form}`.toLowerCase().includes(q),
+    const allowed = options.assignedTo ? returnIdsAssignedTo(options.assignedTo) : null;
+    const visible = <T extends { returnId: string }>(items: readonly T[]): readonly T[] =>
+      allowed ? items.filter((i) => allowed.has(i.returnId)) : items;
+
+    const returns: SearchResult[] = ALL_RETURNS.filter(
+      (r) =>
+        (!allowed || allowed.has(r.id)) &&
+        `${r.clientName} ${r.form}`.toLowerCase().includes(q),
     ).map((r) => ({
       type: "return",
       id: r.id,
@@ -127,20 +149,20 @@ export const api = {
       href: r.id === HERO_RETURN_ID ? `/staff/returns/${r.id}` : `/staff/returns`,
     }));
 
-    const documents: SearchResult[] = ALL_DOCUMENTS.filter((d) =>
-      `${d.title} ${d.clientName}`.toLowerCase().includes(q),
-    ).map((d) => ({
-      type: "document",
-      id: d.id,
-      title: d.title,
-      subtitle: d.clientName,
-      href:
-        d.returnId === HERO_RETURN_ID
-          ? `/staff/returns/${d.returnId}?doc=${d.id}`
-          : "/staff/documents",
-    }));
+    const documents: SearchResult[] = visible(ALL_DOCUMENTS)
+      .filter((d) => `${d.title} ${d.clientName}`.toLowerCase().includes(q))
+      .map((d) => ({
+        type: "document",
+        id: d.id,
+        title: d.title,
+        subtitle: d.clientName,
+        href:
+          d.returnId === HERO_RETURN_ID
+            ? `/staff/returns/${d.returnId}?doc=${d.id}`
+            : "/staff/documents",
+      }));
 
-    const threads: SearchResult[] = heroThreads
+    const threads: SearchResult[] = visible(heroThreads)
       .filter((t) => t.subject.toLowerCase().includes(q))
       .map((t) => ({
         type: "thread",

@@ -18,7 +18,8 @@ export interface ClientProgress {
    */
   daveAnswers: Readonly<Record<string, string>>;
   daveQuestionnaireDone: boolean;
-  daveDocsStarted: boolean;
+  /** Business documents Dave has uploaded, by document id. */
+  daveUploadedDocIds: readonly string[];
 }
 
 const KEY = "meridian.client-progress";
@@ -29,7 +30,7 @@ const DEFAULT_PROGRESS: ClientProgress = {
   questionAnswered: false,
   daveAnswers: {},
   daveQuestionnaireDone: false,
-  daveDocsStarted: false,
+  daveUploadedDocIds: [],
 };
 
 export function readProgress(): ClientProgress {
@@ -45,7 +46,9 @@ export function readProgress(): ClientProgress {
           ? parsed.daveAnswers
           : {},
       daveQuestionnaireDone: parsed.daveQuestionnaireDone === true,
-      daveDocsStarted: parsed.daveDocsStarted === true,
+      daveUploadedDocIds: Array.isArray(parsed.daveUploadedDocIds)
+        ? parsed.daveUploadedDocIds.filter((id): id is string => typeof id === "string")
+        : [],
     };
   } catch {
     return DEFAULT_PROGRESS;

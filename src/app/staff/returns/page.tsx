@@ -12,13 +12,14 @@ import { STAGES, stageById } from "@/data/statuses";
 import type { StageId } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 
 /**
  * Every return, grouped by where it is in the pipeline. Summary view —
  * one click deeper is the full workspace (Challenge 09's summary/detail).
  */
 export default function ReturnsList() {
-  const { data: returns, loading } = useQuery(() => api.getReturns(), []);
+  const { data: returns, loading, error } = useQuery(() => api.getReturns(), []);
   const { persona } = useRole();
   const [stageFilter, setStageFilter] = useState<StageId | "all">("all");
 
@@ -76,6 +77,8 @@ export default function ReturnsList() {
           <CardSkeleton rows={3} />
         </div>
       )}
+
+      {error && <ErrorState message={error} />}
 
       <ul className="overflow-hidden rounded-xl border border-line bg-card">
         {visible.map((ret) => {

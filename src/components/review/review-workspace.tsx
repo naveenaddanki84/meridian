@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { deadlineLabel } from "@/lib/format";
+import { isUnverified } from "@/lib/field-state";
 import { rememberSpot } from "@/lib/workspace-chip";
 import { addSharedMessage, addSharedThread, useExtraMessages, useExtraThreads } from "@/lib/thread-store";
 import { useToast } from "@/components/ui/toast";
@@ -19,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
 import { DocViewer } from "./doc-viewer";
 import { FieldList } from "./field-list";
 import { InsightCards } from "./insight-cards";
@@ -44,7 +46,10 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
   const { persona } = useRole();
   const { notify } = useToast();
 
-  const { data: ret, loading: retLoading } = useQuery(() => api.getReturn(returnId), [returnId]);
+  const { data: ret, loading: retLoading, error: retError } = useQuery(
+    () => api.getReturn(returnId),
+    [returnId],
+  );
   const { data: apiFields } = useQuery(() => api.getFields(returnId), [returnId]);
   const { data: documents } = useQuery(() => api.getDocumentsForReturn(returnId), [returnId]);
   const { data: apiThreads } = useQuery(() => api.getThreads(returnId, "staff"), [returnId]);
@@ -293,13 +298,9 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
     );
   };
 
-  // The verification workflow (Ch 10): everything awaiting a human forms a queue.
-  const uncheckedFields = fields.filter(
-    (f) =>
-      f.state === "ai_generated" ||
-      f.state === "needs_review" ||
-      f.state === "needs_approval",
-  );
+  // The verification workflow (Ch 10): everything awaiting a human forms a
+  // queue — the same predicate that produces the return's aiFlags count.
+  const uncheckedFields = fields.filter(isUnverified);
   const stepToNextUnchecked = () => {
     if (uncheckedFields.length === 0) return;
     const currentIndex = uncheckedFields.findIndex((f) => f.id === selectedFieldId);
@@ -312,6 +313,15 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
       <div className="space-y-3">
         <CardSkeleton rows={2} />
         <CardSkeleton rows={6} />
+      </div>
+    );
+  }
+
+  if (retError) {
+    return (
+      <div className="space-y-3">
+        <Breadcrumbs clientName="This return" />
+        <ErrorState message={retError} />
       </div>
     );
   }

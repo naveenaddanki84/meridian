@@ -25,7 +25,7 @@ const PERSONA_BLURB: Record<string, string> = {
   emily:
     "Mid-season client. Documents are in, the AI has read them, and one question is waiting for her.",
   mike:
-    "Owns 200+ returns. Sees a prioritized queue and the deep review workspace where every number traces.",
+    "Owns 198 returns. Sees a prioritized queue and the deep review workspace where every number traces.",
   dave: "Brand-new client — signed up this morning. Start here to see onboarding from zero.",
   sarah: "Signs off before filing. Same product, ordered by review risk instead of deadline.",
   linda: "Runs the firm: capacity per preparer, deadline risk, and access requests.",

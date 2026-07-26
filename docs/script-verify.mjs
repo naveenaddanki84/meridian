@@ -1,6 +1,7 @@
 import { chromium } from '/tmp/node_modules/playwright-core/index.mjs';
-// Walks the exact click path in docs/VIDEO_SCRIPT.md, in order, so the script
-// can't drift from the app. Every step is a thing the narrator does on camera.
+// Walks the exact click path in the 10-minute walkthrough script (kept with
+// the submission, outside this repo), in order, so the script can't drift
+// from the app. Every step here is something the narrator does on camera.
 const B="http://localhost:3111"; let pass=0,fail=0;
 const t=(n,c,d="")=>{if(c){pass++;console.log(`  ✓ ${n}`);}else{fail++;console.log(`  ✗ FAIL: ${n} ${d}`);}};
 const b=await chromium.launch({executablePath:"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"});

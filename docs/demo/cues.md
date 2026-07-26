@@ -10,15 +10,18 @@ waits for you.
 |-----|---------|-------------|
 | **00:00** | Opening — the thesis and six lenses | 0:00 |
 | **00:33** | Dave — day one | 0:35 |
-| **01:43** | Dave — documents unlock | 1:45 |
-| **02:23** | Emily — mid-season client | 2:25 |
-| **03:18** | Mike — the actionable dashboard | 3:20 |
-| **04:03** | The hero — source traceability | 4:05 |
-| **05:28** | Trustworthy AI — correction with a receipt | 5:30 |
-| **06:28** | Clickable vs editable — the affordance system | 6:30 |
-| **07:08** | Collaboration and never getting lost | 7:10 |
-| **07:58** | Complexity made navigable | 8:00 |
-| **08:38** | Role-aware — Katie, Sarah, Linda, and the client hat | 8:40 |
-| **09:23** | Close — real vs simulated, path to production | 9:25 |
+| **01:35** | Dave — documents unlock | 1:35 |
+| **02:15** | Emily — mid-season client | 2:15 |
+| **03:10** | Mike — the queue, ranked by urgency | 3:10 |
+| **04:10** | The hero — source traceability | 4:10 |
+| **05:50** | Trustworthy AI — correction with a receipt | 5:50 |
+| **06:50** | Clickable vs editable — the affordance system | 6:50 |
+| **07:30** | Collaboration — and the message actually arrives | 7:30 |
+| **08:55** | Complexity made navigable | 8:55 |
+| **09:30** | Katie — permission, communicated not hidden | 9:30 |
+| **10:15** | Sarah — the reviewer verifies a number | 10:15 |
+| **11:20** | Linda — how the firm is actually doing | 11:20 |
+| **12:10** | Mike — the same login, client hat on | 12:10 |
+| **12:40** | Close — real vs simulated, path to production | 12:40 |
 
-Total runtime: **10:00**
+Total runtime: **13:20**

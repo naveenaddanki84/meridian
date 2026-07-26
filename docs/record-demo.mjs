@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 /**
- * Records the 10-minute walkthrough as a silent screen capture, paced to the
+ * Records the walkthrough (~13 min) as a silent screen capture, paced to the
  * narration in VIDEO_SCRIPT.md, so the voiceover can be laid over it in one
  * pass without racing the visuals.
  *
@@ -174,10 +174,10 @@ for (let i = 0; i < 3; i++) {
 await wait(1500);
 await point('a:has-text("Home")', { settle: 2000 });
 await hover('a:has-text("Tell us about your year")');
-await padTo(103);
+await padTo(95);
 
-// ── 1:45 Documents unlock ───────────────────────────────────────────────────
-section('Dave — documents unlock', '1:45');
+// ── 1:35 Documents unlock ───────────────────────────────────────────────────
+section('Dave — documents unlock', '1:35');
 await go('/client/questionnaire');
 for (let i = 0; i < 3; i++) {
   await point('div.rise-in button:not(:has-text("Back")):not(:has-text("Skip"))', { settle: 1300 });
@@ -190,10 +190,10 @@ await wait(2500);
 await smoothScroll(-300);
 await point('button:has-text("Upload")', { settle: 2600 });
 await point('a:has-text("Home")', { settle: 2000 });
-await padTo(143);
+await padTo(135);
 
-// ── 2:25 Emily, mid-season ──────────────────────────────────────────────────
-section('Emily — mid-season client', '2:25');
+// ── 2:15 Emily, mid-season ──────────────────────────────────────────────────
+section('Emily — mid-season client', '2:15');
 await point('button[aria-expanded]:has-text("Client")');
 await point('button:has-text("Emily Carter")', { settle: 2500 });
 await wait(3500);
@@ -206,39 +206,52 @@ await point('button:has-text("It was $300")', { settle: 2500 });
 await point('a:has-text("Your documents")', { settle: 2000 });
 await point('button:has-text("Upload")', { settle: 4000 });
 await point('a:has-text("Home")', { settle: 2500 });
-await padTo(198);
+await padTo(190);
 
-// ── 3:20 Mike's dashboard ───────────────────────────────────────────────────
-section("Mike — the actionable dashboard", '3:20');
+// ── 3:10 Mike's dashboard ───────────────────────────────────────────────────
+section("Mike — the queue, ranked by urgency", '3:10');
 await point('button[aria-expanded]:has-text("Client")');
 await point('button:has-text("Mike Sullivan")', { settle: 2500 });
 await go('/staff');
-await wait(3500);
-await hover('button:has-text("Need you now")');
-await wait(2000);
-await smoothScroll(280);
 await wait(3000);
-await smoothScroll(-280);
-await point('button:has-text("Whole firm")', { settle: 2500 });
+// Linger on the ordering: the reasons and the deadline are why row one is
+// row one, and that is the whole argument of this screen.
+await hover('li:nth-child(1) span:has-text("overdue")');
+await wait(3000);
+await hover('li:nth-child(2)');
 await wait(2500);
+await point('button:has-text("Waiting on clients")', { settle: 2800 });
+await wait(2500);
+await point('button:has-text("Need you now")', { settle: 2500 });
+await smoothScroll(260);
+await wait(2500);
+await smoothScroll(-260);
+await point('button:has-text("Whole firm")', { settle: 2500 });
+await wait(3000);
 await point('button:has-text("My returns")', { settle: 1500 });
-await padTo(243);
+await padTo(250);
 
-// ── 4:05 Traceability ───────────────────────────────────────────────────────
-section('The hero — source traceability', '4:05');
+// ── 4:10 Traceability ───────────────────────────────────────────────────────
+section('The hero — source traceability', '4:10');
 await go('/staff/returns/ret-emily');
 await wait(2500);
 await point('button:has-text("Wages and salary")', { settle: 3000 });
 await wait(6000);
 await hover('[data-box-id="w2-box1"]');
-await wait(4000);
+await wait(4500);
+// A second number, on a different document — one hardcoded trace proves
+// nothing; two on two forms proves the model.
+await point('button:has-text("Ordinary dividends")', { settle: 3500 });
+await wait(6000);
+await hover('[data-box-id="div-box1a"]');
+await wait(4500);
 await point('button:has-text("Total income")', { settle: 3000 });
 await wait(6000);
-await point('button:has-text("Wages (Line 1a)")', { settle: 3000 });
-await padTo(328);
+await point('button:has-text("Wages (Line 1a)")', { settle: 3500 });
+await padTo(350);
 
-// ── 5:30 Trust and correction ───────────────────────────────────────────────
-section('Trustworthy AI — correction with a receipt', '5:30');
+// ── 5:50 Trust and correction ───────────────────────────────────────────────
+section('Trustworthy AI — correction with a receipt', '5:50');
 await point('button:has-text("Charitable contributions")', { settle: 3000 });
 await wait(6000);
 await hover('[data-box-id="rc-amount"]');
@@ -254,10 +267,10 @@ await wait(2500);
 await smoothScroll(-400);
 await wait(3000);
 await point('button:has-text("Box 3 · 92,100")', { settle: 3500 });
-await padTo(388);
+await padTo(410);
 
-// ── 6:30 Affordances ────────────────────────────────────────────────────────
-section('Clickable vs editable — the affordance system', '6:30');
+// ── 6:50 Affordances ────────────────────────────────────────────────────────
+section('Clickable vs editable — the affordance system', '6:50');
 await point('button:has-text("Legend")', { settle: 3000 });
 await wait(5000);
 await page.keyboard.press('Escape');
@@ -266,10 +279,10 @@ await point('button:has-text("IRA contribution")', { settle: 3000 });
 await wait(4000);
 await point('button:has-text("Standard deduction")', { settle: 3000 });
 await wait(3000);
-await padTo(428);
+await padTo(450);
 
-// ── 7:10 Collaboration + orientation ────────────────────────────────────────
-section('Collaboration and never getting lost', '7:10');
+// ── 7:30 Collaboration, both directions ─────────────────────────────────────
+section('Collaboration — and the message actually arrives', '7:30');
 await point('button:has-text("Conversations")', { settle: 2500 });
 await wait(4000);
 await point('button:has-text("401(k) box 12")', { settle: 3000 });
@@ -280,10 +293,25 @@ await point('button:has-text("Ask the client")', { settle: 2500 });
 await page.locator('textarea').first().fill('Is your Vanguard account still open?');
 await wait(2000);
 await point('button[aria-label="Send"]', { settle: 3000 });
-await padTo(478);
 
-// ── 8:00 Scale ──────────────────────────────────────────────────────────────
-section('Complexity made navigable', '8:00');
+// The half of the loop a demo usually asserts and never shows: cross the
+// wall and watch it land in the client's own list.
+await point('button[aria-expanded]:has-text("Preparer")');
+await point('button:has-text("Emily Carter")', { settle: 3000 });
+await wait(3000);
+await hover('a:has-text("Questions for you")');
+await wait(2500);
+await point('a:has-text("Questions for you")', { settle: 3000 });
+await wait(5000);
+await smoothScroll(240);
+await wait(3000);
+await smoothScroll(-240);
+await point('button[aria-expanded]:has-text("Client")');
+await point('button:has-text("Mike Sullivan")', { settle: 2000 });
+await padTo(535);
+
+// ── 8:55 Scale ──────────────────────────────────────────────────────────────
+section('Complexity made navigable', '8:55');
 await go('/staff/documents');
 await wait(3500);
 await hover('button:has-text("still missing")');
@@ -295,38 +323,74 @@ await page.keyboard.press('Meta+k');
 await wait(1200);
 await page.locator('input[aria-label="Search"]').type('donation', { delay: 110 });
 await wait(3000);
-await padTo(518);
+await padTo(570);
 
-// ── 8:40 The other roles ────────────────────────────────────────────────────
-section('Role-aware — Katie, Sarah, Linda, and the client hat', '8:40');
+// ── 9:30 Permissions ────────────────────────────────────────────────────────
+section('Katie — permission, communicated not hidden', '9:30');
 await page.keyboard.press('Escape');
 await wait(600);
 await point('button[aria-expanded]:has-text("Preparer")');
 await point('button:has-text("Katie Brennan")', { settle: 2000 });
-await go('/staff/returns/ret-emily');
-await wait(4000);
-await point('button:has-text("Request access from Linda")', { settle: 3000 });
-await point('button[aria-expanded]:has-text("Preparer")');
-await point('button:has-text("Sarah Mitchell")', { settle: 3500 });
-await wait(2500);
-await point('button[aria-expanded]:has-text("Reviewer")');
-await point('button:has-text("Linda Brooks")', { settle: 3500 });
+await go('/staff/returns');
+await wait(3500);
+await hover('span:has-text("No access")');
 await wait(3000);
+await go('/staff/returns/ret-emily');
+await wait(4500);
+await point('button:has-text("Request access from Linda")', { settle: 3000 });
+await padTo(615);
+
+// ── 10:15 The reviewer, doing the job ───────────────────────────────────────
+section('Sarah — the reviewer verifies a number', '10:15');
+await point('button[aria-expanded]:has-text("Preparer")');
+await point('button:has-text("Sarah Mitchell")', { settle: 3000 });
+await wait(3500);
+await hover('button:has-text("Check before signing")');
+await wait(3000);
+// Same workspace, a different job: she finds the return and signs a value off.
+await page.keyboard.press('Meta+k');
+await wait(1200);
+await page.locator('input[aria-label="Search"]').type('Emily', { delay: 110 });
+await wait(2200);
+await point('div.rise-in button:has-text("Emily Carter")', { settle: 3500 });
+await point('button:has-text("Qualified dividends")', { settle: 3000 });
+await wait(3500);
+await point('button:has-text("Looks right")', { settle: 3500 });
+await wait(3000);
+await padTo(680);
+
+// ── 11:20 The admin, watching the firm ──────────────────────────────────────
+section('Linda — how the firm is actually doing', '11:20');
+await point('button[aria-expanded]:has-text("Reviewer")');
+await point('button:has-text("Linda Brooks")', { settle: 3000 });
+await wait(3000);
+await hover('h2:has-text("Who\'s carrying what")');
+await wait(3500);
+await hover('span:has-text("over average")');
+await wait(3500);
+await smoothScroll(320);
+await wait(4000);
+await smoothScroll(-320);
+await padTo(730);
+
+// ── 12:10 One person, two hats ──────────────────────────────────────────────
+section('Mike — the same login, client hat on', '12:10');
 await point('button[aria-expanded]:has-text("Firm admin")');
 await point('button:has-text("Mike Sullivan")', { settle: 2000 });
 await point('button[aria-expanded]:has-text("Preparer")');
-await point('button:has-text("My own 2025 return")', { settle: 3000 });
-await padTo(563);
+await point('button:has-text("My own 2025 return")', { settle: 3500 });
+await wait(4000);
+await padTo(760);
 
-// ── 9:25 Close ──────────────────────────────────────────────────────────────
-section('Close — real vs simulated, path to production', '9:25');
+// ── 12:40 Close ─────────────────────────────────────────────────────────────
+section('Close — real vs simulated, path to production', '12:40');
 await go('/');
 await wait(4000);
 await smoothScroll(500);
-await wait(4000);
+await wait(4500);
 await smoothScroll(700);
-await wait(4000);
-await padTo(600);
+await wait(4500);
+await padTo(800);
 
 } catch (err) {
   // Ten minutes of footage is too expensive to throw away over one selector.
@@ -375,7 +439,7 @@ const lines = [
   '|-----|---------|-------------|',
   ...cues.map((c) => `| **${stamp(c.at)}** | ${c.title} | ${c.planned} |`),
   '',
-  `Total runtime: **${stamp(600)}**`,
+  `Total runtime: **${stamp(800)}**`,
 ];
 await writeFile(join(OUT, 'cues.md'), lines.join('\n') + '\n');
 

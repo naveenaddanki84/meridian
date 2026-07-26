@@ -7,7 +7,7 @@ plain-English experience for clients, and a deep, traceable workspace for
 preparers. All ten challenges are covered.
 
 **Live demo:** <https://meridian-gilt-ten.vercel.app> · **Video walkthrough:**
-<https://youtu.be/ekUP5Rzt4wY>
+<https://youtu.be/MlAtiH5tt1w>
 
 ![Review workspace — tracing a wage figure back to Box 1 of the W-2](docs/screenshots/review-trace-w2.jpeg)
 

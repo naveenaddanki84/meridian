@@ -168,7 +168,19 @@ await go("/staff/returns/ret-emily");
 await click('button[aria-expanded]:has-text("Preparer")');
 await click('button:has-text("Sarah Mitchell")', 1200);
 s=await txt(p);
-t("Sarah inherits nothing", !s.includes("Back to Emily Carter's return"), s.slice(0, 120));
+t("Sarah inherits nothing on a direct switch", !s.includes("Back to Emily Carter's return"), s.slice(0, 120));
+
+// The path the walkthrough actually takes: a scoped user is denied the
+// return (so nothing is recorded), then a full-access user switches in.
+await go("/"); await click('button:has-text("Reset demo")');
+await click('a:has-text("Katie Brennan")');
+await go("/staff/returns/ret-emily");
+s=await txt(p);
+t("Katie is still denied", s.includes("isn't yours to open"));
+await click('button[aria-expanded]:has-text("Preparer")');
+await click('button:has-text("Sarah Mitchell")', 1200);
+s=await txt(p);
+t("Sarah inherits nothing after a denial", !s.includes("Back to Emily Carter's return"), s.slice(0, 120));
 
 console.log("\n━━ Day-one copy reads as sentences ━━");
 await go("/"); await click('button:has-text("Reset demo")');

@@ -125,14 +125,17 @@ export function ReviewWorkspace({ returnId }: { returnId: string }) {
 
   // Arriving at the workspace at all — by deep link, search result, or a
   // click — is what makes it worth returning to (Challenge 04).
+  const arrivedAs = useRef<string | null>(null);
   const spotRecordedFor = useRef<string | null>(null);
   useEffect(() => {
+    // Only whoever was here when this screen opened may leave a spot on it.
+    // Switching persona re-runs this effect under the incoming user before
+    // the route changes, which would hand a reviewer a "back to" chip for a
+    // return they never opened — including one they were just denied.
+    if (arrivedAs.current === null) arrivedAs.current = persona.id;
+    if (arrivedAs.current !== persona.id) return;
     // Never offer a way back into a return this person can't open.
     if (!ret || !canOpenReturn(persona, ret)) return;
-    // Record the arrival, not every re-render. Switching persona while the
-    // workspace is open re-runs this effect under the incoming user, and
-    // stamping the spot for them would hand a reviewer a "back to" chip for
-    // a return they never opened.
     if (spotRecordedFor.current === ret.id) return;
     spotRecordedFor.current = ret.id;
     rememberSpot({

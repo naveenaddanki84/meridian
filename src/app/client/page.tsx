@@ -6,6 +6,8 @@ import { api } from "@/lib/api";
 import { useQuery } from "@/lib/use-query";
 import { useRole } from "@/lib/role";
 import { useClientProgress } from "@/lib/client-progress";
+import { isThreadAnsweredBy } from "@/lib/client-questions";
+import { useExtraMessages, useExtraThreads } from "@/lib/thread-store";
 import { HERO_RETURN_ID } from "@/data/hero";
 import type { ChecklistItem } from "@/data/types";
 import { JourneyCard } from "@/components/client/journey-card";
@@ -89,10 +91,18 @@ function daveChecklist(progress: {
 export default function ClientHome() {
   const { persona } = useRole();
   const progress = useClientProgress();
+  const extras = useExtraMessages();
+  const sharedThreads = useExtraThreads();
   const isEmily = persona.id === "emily";
   const isDave = persona.id === "dave";
   const returnId =
     persona.clientReturnId ?? persona.alsoClientOfReturnId ?? HERO_RETURN_ID;
+
+  const firstName = persona.name.split(" ")[0];
+  // Mike prepares both wired clients' returns; other accounts sit with Rachel.
+  const preparerName =
+    isEmily || isDave ? "Mike Sullivan, your preparer" : "Rachel Adams, your preparer";
+  const preparerFirstName = preparerName.split(" ")[0];
 
   const { data: ret, loading, error } = useQuery(() => api.getReturn(returnId), [returnId]);
   const { data: apiChecklist } = useQuery(
@@ -110,7 +120,7 @@ export default function ClientHome() {
   );
 
   // Live progress: finishing a task anywhere updates the home checklist.
-  const checklist = (apiChecklist ?? []).map((item) => {
+  const seededItems = (apiChecklist ?? []).map((item) => {
     if (!isEmily) return item;
     if (item.id === "chk-docs" && progress.k1Uploaded)
       return { ...item, done: true, detail: "All 5 in — thank you!" };
@@ -118,14 +128,32 @@ export default function ClientHome() {
       return { ...item, done: true, detail: "Answered — Mike is on it" };
     return item;
   });
+
+  // A question the preparer raises mid-season is a task like any other, so
+  // it joins the same list the badge counts — home, rail, and the questions
+  // page always report the same number of open asks.
+  const raisedItems: readonly ChecklistItem[] = isEmily
+    ? sharedThreads
+        .filter(
+          (t) =>
+            t.returnId === returnId &&
+            t.visibility === "client" &&
+            t.status !== "resolved" &&
+            !isThreadAnsweredBy(t, extras, persona.id),
+        )
+        .map((t) => ({
+          id: t.id,
+          title: t.subject,
+          detail: `From ${preparerFirstName} — one quick answer`,
+          minutes: 1,
+          done: false,
+          href: "/client/questions",
+        }))
+    : [];
+
+  const checklist = [...seededItems, ...raisedItems];
   const openItems = checklist.filter((item) => !item.done);
   const totalMinutes = openItems.reduce((sum, item) => sum + item.minutes, 0);
-  const firstName = persona.name.split(" ")[0];
-  const preparerName = isDave
-    ? "Mike Sullivan, your preparer"
-    : isEmily
-      ? "Mike Sullivan, your preparer"
-      : "Rachel Adams, your preparer";
 
   // Only wired client accounts get the full experience.
   if (!isEmily && !isDave && !persona.alsoClientOfReturnId) {

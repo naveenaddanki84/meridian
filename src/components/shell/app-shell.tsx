@@ -58,8 +58,12 @@ function WorkspaceChip() {
 
 function ShellFrame({ children }: { children: React.ReactNode }) {
   const { persona } = useRole();
+  const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
-  const isStaffView = persona.role !== "client";
+  // The shell wins over the role, same rule the nav rail follows: a staff
+  // member wearing their client hat gets no firm-wide search, because
+  // "firm tools are hidden here" has to be true and not just reassuring.
+  const isStaffView = persona.role !== "client" && !pathname.startsWith("/client");
 
   useEffect(() => {
     if (!isStaffView) return;

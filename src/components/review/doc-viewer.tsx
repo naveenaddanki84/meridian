@@ -1,92 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { CircleDashed } from "lucide-react";
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
 import type { TaxDocument } from "@/data/types";
 import { relativeLabel } from "@/lib/format";
+import { documentPdfUrl, openPdf } from "@/lib/pdf";
+import { CardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
+import { PdfPage } from "./pdf-page";
 
 /**
- * Fabricated source documents rendered as crisp HTML "pages" so boxes can
- * be highlighted and traced. Real OCR/PDF rendering is out of scope by
- * design — the interaction model is what's being proven.
+ * The source document, as an actual PDF.
+ *
+ * The files in public/documents are fabricated — printed from the app's own
+ * /print route — but the rendering path is the real one: pdf.js paints the
+ * page, and the provenance highlight is an overlay positioned in the
+ * document's coordinate space. That's the same shape production takes, where
+ * the PDF is a stored artifact and extraction returns box coordinates.
  */
-
-function FormPage({
-  doc,
-  page,
-  activeBoxId,
-  highlightColor,
-  registerBox,
-}: {
-  doc: TaxDocument;
-  page: number;
-  activeBoxId: string | null;
-  highlightColor: string;
-  registerBox: (id: string, el: HTMLElement | null) => void;
-}) {
-  const boxes = doc.boxes.filter((b) => b.page === page);
-  const isReceipt = doc.kind === "Receipt";
-
-  return (
-    <div className="relative aspect-[8.5/9] w-full rounded-lg border border-line-strong bg-white shadow-lift">
-      {/* Form header */}
-      <div className="flex items-start justify-between border-b border-line px-4 py-2.5">
-        <div>
-          <p className="font-mono text-[12px] font-semibold uppercase tracking-wide text-ink">
-            {doc.kind}
-          </p>
-          <p className="text-[12px] text-ink-faint">{doc.issuer}</p>
-        </div>
-        <p className="font-mono text-[12px] text-ink-faint">
-          Tax year 2025 · p.{page}/{doc.pages}
-        </p>
-      </div>
-
-      {/* Boxes */}
-      <div className="absolute inset-x-0 bottom-0 top-14">
-        {boxes.map((box) => {
-          const active = box.id === activeBoxId;
-          return (
-            <div
-              key={box.id}
-              ref={(el) => registerBox(box.id, el)}
-              className={`absolute rounded-sm border px-1.5 py-1 transition-all duration-200 ${
-                active
-                  ? "z-10 border-transparent shadow-pop"
-                  : "border-line bg-white"
-              }`}
-              style={{
-                left: `${box.x}%`,
-                top: `${box.y}%`,
-                width: `${box.w}%`,
-                minHeight: `${box.h}%`,
-                ...(active
-                  ? {
-                      boxShadow: `0 0 0 2px ${highlightColor}, 0 8px 24px rgb(28 35 33 / 0.18)`,
-                      backgroundColor: "#fffef8",
-                    }
-                  : {}),
-              }}
-            >
-              <p className="truncate text-[12px] font-medium uppercase tracking-wide text-ink-faint">
-                {box.label}
-              </p>
-              <p
-                className={`whitespace-pre-line text-[12px] leading-snug ${
-                  isReceipt
-                    ? "font-display italic text-ink"
-                    : "font-mono text-ink"
-                } ${active ? "font-semibold" : ""}`}
-              >
-                {box.value}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function DocViewer({
   documents,
   activeDocId,
@@ -103,6 +35,42 @@ export function DocViewer({
   registerBox: (id: string, el: HTMLElement | null) => void;
 }) {
   const activeDoc = documents.find((d) => d.id === activeDocId) ?? null;
+  /**
+   * The result is tagged with the document it belongs to, so switching tabs
+   * shows a skeleton rather than the previous document's pages while the
+   * next one decodes — and the effect never has to reset state on the way in.
+   */
+  const [result, setResult] = useState<
+    { docId: string; pdf: PDFDocumentProxy } | { docId: string; failed: true } | null
+  >(null);
+
+  useEffect(() => {
+    if (!activeDoc || activeDoc.pages === 0) return;
+    const docId = activeDoc.id;
+
+    let cancelled = false;
+    let task: PDFDocumentLoadingTask | null = null;
+
+    openPdf(documentPdfUrl(docId))
+      .then(async (loading) => {
+        task = loading;
+        const pdf: PDFDocumentProxy = await loading.promise;
+        if (!cancelled) setResult({ docId, pdf });
+      })
+      .catch(() => {
+        if (!cancelled) setResult({ docId, failed: true });
+      });
+
+    return () => {
+      cancelled = true;
+      void task?.destroy();
+    };
+  }, [activeDoc]);
+
+  const current = result && activeDoc && result.docId === activeDoc.id ? result : null;
+  const pdf = current && "pdf" in current ? current.pdf : null;
+  const failed = current !== null && "failed" in current;
+  const loading = activeDoc !== null && activeDoc.pages > 0 && !pdf && !failed;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -141,20 +109,29 @@ export function DocViewer({
             {activeDoc.uploadedAt && (
               <span className="text-ink-faint">
                 {" "}
-                · uploaded {relativeLabel(activeDoc.uploadedAt)}
+                · uploaded {relativeLabel(activeDoc.uploadedAt)} · PDF
               </span>
             )}
           </p>
-          {Array.from({ length: activeDoc.pages }, (_, i) => (
-            <FormPage
-              key={i}
-              doc={activeDoc}
-              page={i + 1}
-              activeBoxId={activeBoxId}
-              highlightColor={highlightColor}
-              registerBox={registerBox}
-            />
-          ))}
+
+          {loading && <CardSkeleton rows={8} />}
+
+          {failed && (
+            <ErrorState message="The source document didn't load. Refreshing the page usually fixes it." />
+          )}
+
+          {pdf &&
+            Array.from({ length: activeDoc.pages }, (_, i) => (
+              <PdfPage
+                key={`${activeDoc.id}-${i}`}
+                pdf={pdf}
+                pageNumber={i + 1}
+                boxes={activeDoc.boxes.filter((b) => b.page === i + 1)}
+                activeBoxId={activeBoxId}
+                highlightColor={highlightColor}
+                registerBox={registerBox}
+              />
+            ))}
         </div>
       ) : (
         <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-line-strong text-center">

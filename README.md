@@ -36,7 +36,7 @@ walkthrough:** `TODO — paste recording link before submitting`
 
 | # | Challenge | Where it lives | The one-line decision |
 |---|-----------|----------------|----------------------|
-| 01 | Source traceability | Review workspace | Click any value → a drawn thread + highlighted box on the source document; calculations chain (click an input to keep tracing), and the receipt says when there's *no* AI involved |
+| 01 | Source traceability | Review workspace | Click any value → a drawn thread + a highlight landing on the exact box of the **real PDF** (pdf.js, with the provenance overlay in the document's own coordinate space); calculations chain (click an input to keep tracing), and the receipt says when there's *no* AI involved |
 | 02 | Client & CPA collaboration | Conversations panel · client "Questions for you" | Threads pin to fields/documents, are marked *Firm only* vs *Client can see*, and outstanding requests are tracked — grouped by whose move it is, with age |
 | 03 | Where to start | Client home | One card: what needs you, how long it takes, in minutes — and the interface visibly changes as onboarding completes (finish everything and the checklist gives way to status) |
 | 04 | Getting lost | Everywhere | URL-deep-linkable state, breadcrumbs, thread→field jumps, and a "Back to Emily's return" chip that survives any detour |
@@ -53,6 +53,13 @@ walkthrough:** `TODO — paste recording link before submitting`
 - Every interaction above: tracing, correction/verify/approve flows, threads and
   visibility rules, prioritization scoring, search, filters, deep links, role
   switching, the upload state machine
+- **Real PDF rendering.** The source documents are actual PDFs in
+  `public/documents/`, painted by pdf.js, with the provenance highlight as an
+  overlay positioned in the document's coordinate space — the same architecture
+  production uses, where the PDF is a stored artifact and extraction returns box
+  coordinates. The artwork is generated from the app's own `/print/[docId]`
+  route (`pnpm make-pdfs`), so the printed page and the overlay are laid out
+  from one set of coordinates and cannot drift apart
 - The dataset: 503 returns and 4,028 documents generated deterministically
   (seeded PRNG) so edge cases are guaranteed present — a 62%-confidence
   extraction, a client-reported value awaiting approval, locked fields, a filed
@@ -80,8 +87,10 @@ walkthrough:** `TODO — paste recording link before submitting`
   render real loading skeletons and a shared error surface if a fetch fails
 
 **Simulated (by design — the brief asks for it):**
-- OCR/document parsing: source documents are HTML renderings with hardcoded
-  box coordinates; "the AI read Box 1" is fabricated provenance data
+- OCR/document parsing: the PDFs are fabricated and their box coordinates are
+  hand-authored, so "the AI read Box 1" is fabricated provenance data. The
+  *rendering and overlay path* is real; the extraction that would produce those
+  coordinates is not
 - AI confidence scores and notes: hand-authored to exercise the trust UI
 - Auth: the persona switcher stands in for login; permissions are enforced in
   the API layer (clients never receive internal threads), not by real auth
@@ -129,7 +138,7 @@ walkthrough:** `TODO — paste recording link before submitting`
 ## How I verified it
 
 Behaviour is checked by scripted browser runs against the real app rather than
-by clicking around — **222 assertions across six suites**, all passing:
+by clicking around — **228 assertions across six suites**, all passing:
 
 ```bash
 pnpm dev --port 3111           # then, in another shell:
@@ -137,7 +146,7 @@ node docs/demo-verify.mjs      # 57 · the core client ↔ preparer demo path
 node docs/roles-verify.mjs     # 46 · Dave, Katie, Sarah, Linda role surfaces
 node docs/roundtrip-verify.mjs # 16 · messages crossing roles in both directions
 node docs/progress-verify.mjs  # 18 · onboarding progress, resume, and skip
-node docs/fixes-verify.mjs     # 27 · permission scope, validation, count parity
+node docs/fixes-verify.mjs     # 33 · permission scope, validation, PDF overlay alignment
 node docs/script-verify.mjs    # 58 · the walkthrough's exact click path, in order
 node docs/a11y-audit.mjs       # contrast/labels/scroll on 9 routes × 2 viewports
 ```
@@ -169,9 +178,13 @@ src/data/        types.ts · statuses.ts (the state machine) · people.ts
                  hero.ts (Emily's fully-traced return) · seed.ts (the 503/4,028 generator)
 src/lib/         api.ts (the only file production replaces) · priority.ts (ranking)
                  access.ts · field-state.ts · money.ts · client-questions.ts
-src/components/  review/ (the hero workspace) · client/ · dashboard/ · shell/ · ui/
+                 pdf.ts (lazy pdf.js) · doc-geometry.ts (the shared box coordinates)
+src/components/  review/ (the hero workspace + PDF viewer) · client/ · dashboard/
+                 shell/ · ui/
 src/app/         client/ and staff/ shells, the landing page, the role picker
-docs/            verification suites + screenshots
+                 print/[docId] — document artwork, printed to PDF by tooling
+public/documents/ the generated source PDFs the workspace renders
+docs/            verification suites · make-pdfs.mjs · screenshots
 ```
 
 ## Run locally
@@ -181,7 +194,15 @@ pnpm install
 pnpm build && pnpm start   # or: pnpm dev
 ```
 
-Node 20+. No environment variables, no database — everything is seeded.
+Node 20+. No environment variables, no database — everything is seeded. The
+pdf.js worker is copied into `public/` automatically before dev and build.
+
+The source PDFs are committed, so nothing needs regenerating to run the app. If
+you change a document's box coordinates, re-print them with the dev server up:
+
+```bash
+pnpm make-pdfs   # drives /print/[docId] in headless Chrome → public/documents/
+```
 
 ## Deploy
 
@@ -215,10 +236,10 @@ become. The prioritization scorer moves server-side unchanged.
 
 ## With another week
 
-Real PDF rendering with box overlays instead of HTML stand-ins, notifications
-and nudges, e-sign for client approval, a proper audit-log page built on the
-provenance data, and the second client (Dave) traceable end-to-end the way
-Emily already is.
+Notifications and nudges, e-sign for client approval, a proper audit-log page
+built on the provenance data, text-layer selection and search inside the PDF
+viewer, and the second client (Dave) traceable end-to-end the way Emily
+already is.
 
 ---
 

@@ -87,8 +87,8 @@ s=await txt(p);
 t("provenance card open", s.includes("Read from")&&s.includes("Wages, tips"));
 t("shows confidence", s.includes("98%"));
 t("evidence doc opened", s.includes("Lumen Health Systems"));
-const box = await p.evaluate(()=>{const el=[...document.querySelectorAll("div")].find(d=>d.textContent.trim().match(/^1 · wages/i));return el?getComputedStyle(el).boxShadow!=="none":false;});
-t("source box highlighted", box);
+const box = await p.evaluate(()=>{const el=document.querySelector('[data-box-id="w2-box1"]');return el?el.dataset.active==="true"&&getComputedStyle(el).boxShadow!=="none":false;});
+t("source box highlighted on the PDF", box);
 const svg = await p.locator("svg path.trace-path").count();
 t("trace thread drawn", svg>0, `paths=${svg}`);
 await click('button:has-text("Looks right")');
@@ -125,7 +125,7 @@ t("AI review notes present", s.includes("AI REVIEW NOTES")||s.includes("AI revie
 t("recommendation w/ reasoning", s.includes("Keep the standard deduction")&&s.includes("far below"));
 t("warning explained", s.includes("that's expected"));
 await click('button:has-text("Box 3 · 92,100")');
-const box2=await p.evaluate(()=>{const el=[...document.querySelectorAll("div")].find(d=>d.textContent.trim().match(/^3 · social security wages/i));return el?getComputedStyle(el).boxShadow!=="none":false;});
+const box2=await p.evaluate(()=>{const el=document.querySelector('[data-box-id="w2-box3"]');return el?el.dataset.active==="true"&&getComputedStyle(el).boxShadow!=="none":false;});
 t("evidence chip highlights box", box2);
 
 console.log("\n━━ MIKE: ask client → new thread ━━");

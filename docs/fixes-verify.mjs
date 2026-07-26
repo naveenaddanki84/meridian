@@ -67,6 +67,38 @@ s=await txt(p);
 const ws=(s.match(/Review next flagged value (\d+)/)||[])[1];
 t("dashboard count = workspace count", dash===ws&&!!dash, `dashboard=${dash} workspace=${ws}`);
 
+console.log("\n━━ Source documents are real PDFs ━━");
+await go("/staff/returns/ret-emily?field=f-wages");
+await p.waitForTimeout(1200);
+const pdfState = await p.evaluate(() => {
+  const canvas = document.querySelector('[data-pane="doc"] canvas');
+  const active = document.querySelector('[data-box-id][data-active="true"]');
+  const all = document.querySelectorAll('[data-box-id]');
+  return {
+    painted: !!canvas && canvas.width > 200 && canvas.height > 200,
+    activeId: active?.getAttribute("data-box-id") ?? null,
+    ring: active ? getComputedStyle(active).boxShadow !== "none" : false,
+    boxCount: all.length,
+    // The overlay must sit on top of the canvas, not beside it.
+    overlaps: (() => {
+      if (!canvas || !active) return false;
+      const c = canvas.getBoundingClientRect(), a = active.getBoundingClientRect();
+      return a.left >= c.left - 2 && a.right <= c.right + 2 && a.top >= c.top - 2 && a.bottom <= c.bottom + 2;
+    })(),
+  };
+});
+t("pdf.js painted the page", pdfState.painted, JSON.stringify(pdfState));
+t("all boxes registered as overlays", pdfState.boxCount === 12, `boxes=${pdfState.boxCount}`);
+t("the wage box is the highlighted one", pdfState.activeId === "w2-box1", `active=${pdfState.activeId}`);
+t("highlight ring drawn", pdfState.ring);
+t("overlay sits within the rendered page", pdfState.overlaps);
+const pdfRes = await p.evaluate(async () => {
+  const r = await fetch("/documents/doc-w2.pdf");
+  const buf = await r.arrayBuffer();
+  return { status: r.status, head: new TextDecoder().decode(buf.slice(0, 5)), bytes: buf.byteLength };
+});
+t("served as a real PDF file", pdfRes.status === 200 && pdfRes.head === "%PDF-", JSON.stringify(pdfRes));
+
 console.log("\n━━ Corrections are validated ━━");
 await go("/staff/returns/ret-emily?field=f-charitable");
 await click('button:has-text("Fix it")');
